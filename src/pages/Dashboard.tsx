@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import NeuralOrb from "@/components/NeuralOrb";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
@@ -6,18 +7,15 @@ import QuestButton from "@/components/QuestButton";
 import { Zap, Shield, Activity, ChevronRight } from "lucide-react";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 bg-background" />
-      <div
-        className="fixed inset-0 opacity-20"
-        style={{
-          background: "radial-gradient(ellipse 50% 40% at 50% 20%, rgba(0,242,254,0.1) 0%, transparent 70%)",
-        }}
-      />
+      <div className="fixed inset-0 bg-background aurora-bg" />
+      <div className="fixed inset-0" style={{
+        background: "radial-gradient(ellipse 50% 40% at 50% 15%, rgba(0,230,220,0.07) 0%, transparent 70%)",
+      }} />
 
-      {/* Content */}
       <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pb-24">
         {/* Header */}
         <motion.div
@@ -28,24 +26,28 @@ const Dashboard = () => {
         >
           <div>
             <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">SWARM_DASHBOARD</p>
-            <h1 className="text-xl font-mono font-bold tracking-tighter gradient-text-cyan">EVO_AEGIS</h1>
+            <h1 className="text-xl font-mono font-bold tracking-tighter gradient-text-aurora">EVO_AEGIS</h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+            <motion.span
+              className="w-2 h-2 rounded-full bg-success"
+              animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <span className="text-[10px] font-mono text-success">ONLINE</span>
           </div>
         </motion.div>
 
-        {/* Twin Avatar & Quest CTA */}
-        <GlassZone className="p-6 mb-4" glow delay={0.1}>
+        {/* Quest CTA */}
+        <GlassZone className="p-6 mb-4" glow="cyan" delay={0.1}>
           <div className="flex items-center gap-5">
             <NeuralOrb size={80} />
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-1">DAILY MICRO-QUEST</p>
               <p className="text-sm font-sans text-foreground/90 mb-3">
-                Capture a 30-second audio sample to evolve your twin.
+                Capture a 30-second sample to evolve your twin.
               </p>
-              <QuestButton className="w-full">
+              <QuestButton className="w-full" onClick={() => navigate("/quest")}>
                 <Zap className="w-4 h-4 text-primary" />
                 <span className="gradient-text-cyan text-xs font-semibold">BEGIN BURST TRAINING</span>
                 <ChevronRight className="w-3 h-3 text-muted-foreground" />
@@ -54,35 +56,35 @@ const Dashboard = () => {
           </div>
         </GlassZone>
 
-        {/* Stats Grid */}
+        {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <StatWidget label="ZK-PROOFS" value="1,482" delay={0.2} />
-          <StatWidget label="LOCAL WEIGHTS" value="847" unit="SYNCED" delay={0.3} />
-          <StatWidget label="REWARD POOL" value="0.0042" unit="ETH" delay={0.4} />
-          <StatWidget label="TWIN LEVEL" value="07" unit="/ 99" delay={0.5} />
+          <StatWidget label="ZK-PROOFS" value="1,482" accent="cyan" delay={0.2} />
+          <StatWidget label="LOCAL WEIGHTS" value="847" unit="SYNCED" accent="violet" delay={0.3} />
+          <StatWidget label="REWARD POOL" value="0.0042" unit="ETH" accent="amber" delay={0.4} />
+          <StatWidget label="TWIN LEVEL" value="07" unit="/ 99" accent="success" delay={0.5} />
         </div>
 
-        {/* Evolution Timeline */}
+        {/* Evolution */}
         <GlassZone className="p-5 mb-4" delay={0.6}>
           <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-4">NEURAL EVOLUTION</p>
           <div className="space-y-3">
             {[
-              { label: "COGNITION", value: 72, color: "bg-primary" },
-              { label: "PERCEPTION", value: 58, color: "bg-accent" },
-              { label: "SYNTHESIS", value: 41, color: "bg-success" },
+              { label: "COGNITION", value: 72, color: "#00E6DC" },
+              { label: "PERCEPTION", value: 58, color: "#A050FF" },
+              { label: "SYNTHESIS", value: 41, color: "#FFB432" },
             ].map((stat, i) => (
               <div key={stat.label}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[10px] font-mono text-muted-foreground tracking-wider">{stat.label}</span>
                   <span className="text-[10px] font-mono text-foreground/70 mono-nums">{stat.value}%</span>
                 </div>
-                <div className="h-1 rounded-full bg-white/[0.05] overflow-hidden">
+                <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
                   <motion.div
-                    className={`h-full rounded-full ${stat.color}`}
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: stat.color }}
                     initial={{ width: 0 }}
                     animate={{ width: `${stat.value}%` }}
                     transition={{ duration: 1, delay: 0.8 + i * 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-                    style={{ opacity: 0.7 }}
                   />
                 </div>
               </div>
@@ -90,18 +92,18 @@ const Dashboard = () => {
           </div>
         </GlassZone>
 
-        {/* Live Feed / Logs */}
+        {/* Activity */}
         <GlassZone className="p-5" delay={0.8}>
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-3 h-3 text-primary" />
             <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">SWARM ACTIVITY</p>
           </div>
-          <div className="space-y-2 font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+          <div className="space-y-2.5 font-mono text-[10px] text-muted-foreground/50 leading-relaxed">
             {[
-              { time: "14:23:01", msg: "ZK-PROOF #1482 VERIFIED", icon: Shield },
-              { time: "14:22:58", msg: "LOCAL WEIGHTS SYNCED TO SWARM", icon: Zap },
-              { time: "14:22:41", msg: "BURST TRAINING COMPLETE — +0.0003 ETH", icon: Activity },
-              { time: "14:22:12", msg: "NODE_0x7F3A CONNECTED", icon: Shield },
+              { time: "14:23:01", msg: "ZK-PROOF #1482 VERIFIED", icon: Shield, color: "#00E6DC" },
+              { time: "14:22:58", msg: "LOCAL WEIGHTS SYNCED TO SWARM", icon: Zap, color: "#A050FF" },
+              { time: "14:22:41", msg: "BURST TRAINING +0.0003 ETH", icon: Activity, color: "#FFB432" },
+              { time: "14:22:12", msg: "NODE_0x7F3A CONNECTED", icon: Shield, color: "#00B4FF" },
             ].map((log, i) => (
               <motion.div
                 key={i}
@@ -110,20 +112,19 @@ const Dashboard = () => {
                 transition={{ duration: 0.4, delay: 1 + i * 0.1 }}
                 className="flex items-center gap-3"
               >
-                <span className="text-muted-foreground/30 mono-nums">{log.time}</span>
-                <log.icon className="w-3 h-3 text-primary/40 shrink-0" />
+                <span className="text-muted-foreground/25 mono-nums shrink-0">{log.time}</span>
+                <log.icon className="w-3 h-3 shrink-0" style={{ color: log.color, opacity: 0.5 }} />
                 <span className="tracking-wider">{log.msg}</span>
               </motion.div>
             ))}
           </div>
         </GlassZone>
 
-        {/* Bottom telemetry bar */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="mt-6 text-center text-[9px] font-mono text-muted-foreground/30 tracking-[0.2em]"
+          className="mt-6 text-center text-[9px] font-mono text-muted-foreground/25 tracking-[0.2em]"
         >
           PROOFS: 1,482 | LATENCY: 14ms | REWARD: 0.0042 ETH
         </motion.div>
