@@ -56,7 +56,7 @@ const EvoEyes = ({ size, mood = "idle" }: { size: number; mood: string }) => {
       setExpression(mood);
       return;
     }
-    const moods: Array<typeof mood> = ["happy", "curious", "idle", "excited"];
+    const moods: Array<"happy" | "curious" | "sleepy" | "excited" | "idle"> = ["happy", "curious", "idle", "excited"];
     const interval = setInterval(() => {
       setExpression(moods[Math.floor(Math.random() * moods.length)]);
     }, 5000 + Math.random() * 3000);
