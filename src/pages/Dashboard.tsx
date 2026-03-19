@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import NeuralOrb from "@/components/NeuralOrb";
+import EvoTwin from "@/components/EvoTwin";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
 import QuestButton from "@/components/QuestButton";
@@ -41,7 +41,7 @@ const Dashboard = () => {
         {/* Quest CTA */}
         <GlassZone className="p-6 mb-4" glow="cyan" delay={0.1}>
           <div className="flex items-center gap-5">
-            <NeuralOrb size={80} />
+            <EvoTwin size={80} level={7} />
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-1">DAILY MICRO-QUEST</p>
               <p className="text-sm font-sans text-foreground/90 mb-3">
