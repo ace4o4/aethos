@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import NeuralOrb from "@/components/NeuralOrb";
+import EvoTwin from "@/components/EvoTwin";
 import QuestButton from "@/components/QuestButton";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 
 const Gateway = () => {
@@ -11,11 +12,13 @@ const Gateway = () => {
       {/* Aurora background */}
       <div className="fixed inset-0 bg-background aurora-bg" />
       <div className="fixed inset-0" style={{
-        background: "radial-gradient(ellipse 70% 50% at 50% 45%, rgba(0,230,220,0.08) 0%, rgba(160,80,255,0.04) 40%, transparent 70%)",
+        background: "radial-gradient(ellipse 70% 50% at 50% 45%, hsl(var(--primary) / 0.08) 0%, hsl(var(--secondary) / 0.04) 40%, transparent 70%)",
       }} />
-      <div className="fixed inset-0" style={{
-        background: "radial-gradient(ellipse 40% 35% at 65% 60%, rgba(255,180,50,0.04) 0%, transparent 60%)",
-      }} />
+
+      {/* Theme toggle */}
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggle />
+      </div>
 
       {/* Hex data stream */}
       <div className="fixed top-0 left-8 opacity-[0.03] font-mono text-[10px] leading-4 select-none pointer-events-none overflow-hidden h-full">
@@ -38,14 +41,14 @@ const Gateway = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <NeuralOrb size={260} className="mb-8" />
+          <EvoTwin size={240} level={1} mood="curious" label="Evo-1X" sublabel="INITIALIZATION" />
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-          className="text-3xl sm:text-4xl font-mono font-bold tracking-tighter mb-4"
+          className="text-3xl sm:text-4xl font-mono font-bold tracking-tighter mb-4 mt-6"
         >
           <span className="gradient-text-aurora">JOIN THE GLOBAL</span>
           <br />
