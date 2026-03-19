@@ -1,358 +1,472 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Sparkles } from "@react-three/drei";
-import { useRef, useMemo, useState, useEffect, useCallback } from "react";
-import * as THREE from "three";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EvoTwinProps {
   level?: number;
   size?: number;
   className?: string;
-  mood?: "happy" | "curious" | "sleepy" | "excited" | "idle";
+  mood?: "idle" | "happy" | "curious" | "sleepy" | "excited" | "thinking" | "surprised";
+  label?: string;
+  sublabel?: string;
 }
 
-/* ─── Cute Eyes Overlay ─── */
-const EvoEyes = ({ size, mood = "idle" }: { size: number; mood: string }) => {
+type MoodType = EvoTwinProps["mood"];
+
+/* ─── Orbiting Dot ─── */
+const OrbitDot = ({
+  angle,
+  radius,
+  dotSize,
+  color,
+  speed,
+  delay,
+}: {
+  angle: number;
+  radius: number;
+  dotSize: number;
+  color: string;
+  speed: number;
+  delay: number;
+}) => (
+  <motion.div
+    className="absolute rounded-full"
+    style={{
+      width: dotSize,
+      height: dotSize,
+      background: color,
+      boxShadow: `0 0 ${dotSize * 2}px ${color}, 0 0 ${dotSize * 4}px ${color}50`,
+      top: "50%",
+      left: "50%",
+    }}
+    animate={{
+      x: [
+        Math.cos((angle * Math.PI) / 180) * radius - dotSize / 2,
+        Math.cos(((angle + 360) * Math.PI) / 180) * radius - dotSize / 2,
+      ],
+      y: [
+        Math.sin((angle * Math.PI) / 180) * radius - dotSize / 2,
+        Math.sin(((angle + 360) * Math.PI) / 180) * radius - dotSize / 2,
+      ],
+    }}
+    transition={{
+      duration: speed,
+      delay,
+      repeat: Infinity,
+      ease: "linear",
+    }}
+  />
+);
+
+/* ─── The Evo Twin ─── */
+const EvoTwin = ({
+  level = 7,
+  size = 200,
+  className = "",
+  mood = "idle",
+  label,
+  sublabel,
+}: EvoTwinProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [blinkState, setBlinkState] = useState(false);
   const [pupilOffset, setPupilOffset] = useState({ x: 0, y: 0 });
-  const [expression, setExpression] = useState(mood);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [currentMood, setCurrentMood] = useState<MoodType>(mood);
 
-  // Blink cycle
+  const scale = size / 200;
+  const normalizedLevel = Math.min(level, 99) / 99;
+
+  // Color based on level
+  const accentColor = useMemo(() => {
+    if (normalizedLevel < 0.33) return "#00E6DC";
+    if (normalizedLevel < 0.66) return "#A050FF";
+    return "#FFB432";
+  }, [normalizedLevel]);
+
+  const secondaryColor = useMemo(() => {
+    if (normalizedLevel < 0.33) return "#00B4FF";
+    if (normalizedLevel < 0.66) return "#7C5CFF";
+    return "#FF7849";
+  }, [normalizedLevel]);
+
+  // Blink
   useEffect(() => {
     const blink = () => {
       setBlinkState(true);
-      setTimeout(() => setBlinkState(false), 150);
+      setTimeout(() => setBlinkState(false), 120);
     };
     const interval = setInterval(() => {
       blink();
-      // Occasionally double-blink
-      if (Math.random() > 0.7) {
-        setTimeout(blink, 300);
-      }
-    }, 2500 + Math.random() * 2000);
+      if (Math.random() > 0.7) setTimeout(blink, 280);
+    }, 2800 + Math.random() * 2000);
     return () => clearInterval(interval);
   }, []);
 
-  // Pupil follows mouse
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width * 2);
-    const dy = (e.clientY - cy) / (rect.height * 2);
-    const clamp = (v: number, max: number) => Math.max(-max, Math.min(max, v));
-    setPupilOffset({ x: clamp(dx, 0.35), y: clamp(dy, 0.35) });
-  }, []);
+  // Auto mood cycling when idle
+  useEffect(() => {
+    if (mood !== "idle") {
+      setCurrentMood(mood);
+      return;
+    }
+    const moods: MoodType[] = ["idle", "happy", "curious", "thinking", "idle", "excited"];
+    const interval = setInterval(() => {
+      setCurrentMood(moods[Math.floor(Math.random() * moods.length)]);
+    }, 4000 + Math.random() * 3000);
+    return () => clearInterval(interval);
+  }, [mood]);
+
+  // Pupil tracking
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width * 1.5);
+      const dy = (e.clientY - cy) / (rect.height * 1.5);
+      const clamp = (v: number, max: number) => Math.max(-max, Math.min(max, v));
+      setPupilOffset({ x: clamp(dx, 0.3), y: clamp(dy, 0.3) });
+    },
+    []
+  );
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove]);
 
-  // Cycle through expressions
-  useEffect(() => {
-    if (mood !== "idle") {
-      setExpression(mood);
-      return;
-    }
-    const moods: Array<"happy" | "curious" | "sleepy" | "excited" | "idle"> = ["happy", "curious", "idle", "excited"];
-    const interval = setInterval(() => {
-      setExpression(moods[Math.floor(Math.random() * moods.length)]);
-    }, 5000 + Math.random() * 3000);
-    return () => clearInterval(interval);
-  }, [mood]);
+  // Sphere dimensions
+  const sphereSize = size * 0.65;
+  const eyeWidth = 10 * scale;
+  const eyeHeight = 26 * scale;
+  const eyeGap = 22 * scale;
+  const eyeRadius = 6 * scale;
 
-  const scale = size / 200; // normalize to base 200px
-  const eyeSize = 14 * scale;
-  const pupilSize = 7 * scale;
-  const eyeGap = 18 * scale;
-  const eyeY = -2 * scale;
-
-  // Expression shapes
-  const getEyeStyle = (isLeft: boolean) => {
-    const base: React.CSSProperties = {
-      width: eyeSize,
-      height: blinkState ? 2 * scale : eyeSize,
-      borderRadius: blinkState ? `${eyeSize}px` : "50%",
-      background: "radial-gradient(circle at 40% 35%, #ffffff, #e0e8ff)",
-      transition: "all 0.12s ease",
-      position: "relative",
-      overflow: "hidden",
-      boxShadow: `0 0 ${8 * scale}px rgba(0, 230, 220, 0.4), inset 0 ${1 * scale}px ${3 * scale}px rgba(255,255,255,0.3)`,
+  // Expression-specific eye transforms
+  const getEyeShape = (isLeft: boolean) => {
+    const base = {
+      width: eyeWidth,
+      height: blinkState ? 3 * scale : eyeHeight,
+      borderRadius: blinkState ? `${eyeRadius * 2}px` : `${eyeRadius}px`,
+      opacity: 1,
+      rotate: 0,
+      scaleX: 1,
+      scaleY: blinkState ? 0.1 : 1,
+      y: 0,
     };
 
-    if (expression === "happy") {
-      base.height = blinkState ? 2 * scale : eyeSize * 0.65;
-      base.borderRadius = blinkState ? `${eyeSize}px` : `${eyeSize}px ${eyeSize}px 50% 50%`;
-    } else if (expression === "curious") {
-      if (isLeft) {
-        base.height = blinkState ? 2 * scale : eyeSize * 1.15;
-      }
-    } else if (expression === "sleepy") {
-      base.height = blinkState ? 2 * scale : eyeSize * 0.45;
-      base.borderRadius = `${eyeSize}px`;
-    } else if (expression === "excited") {
-      base.width = eyeSize * 1.2;
-      base.height = blinkState ? 2 * scale : eyeSize * 1.2;
-      base.boxShadow = `0 0 ${12 * scale}px rgba(160, 80, 255, 0.6), inset 0 ${1 * scale}px ${3 * scale}px rgba(255,255,255,0.3)`;
+    switch (currentMood) {
+      case "happy":
+        return {
+          ...base,
+          height: blinkState ? 3 * scale : eyeHeight * 0.7,
+          borderRadius: blinkState
+            ? `${eyeRadius * 2}px`
+            : `${eyeRadius}px ${eyeRadius}px ${eyeRadius * 2}px ${eyeRadius * 2}px`,
+          scaleY: blinkState ? 0.1 : 0.8,
+          y: 2 * scale,
+        };
+      case "curious":
+        return {
+          ...base,
+          height: blinkState ? 3 * scale : isLeft ? eyeHeight * 1.2 : eyeHeight * 0.8,
+          scaleY: blinkState ? 0.1 : isLeft ? 1.15 : 0.85,
+          rotate: isLeft ? -5 : 5,
+        };
+      case "sleepy":
+        return {
+          ...base,
+          height: blinkState ? 2 * scale : eyeHeight * 0.35,
+          borderRadius: `${eyeRadius * 2}px`,
+          scaleY: blinkState ? 0.1 : 0.4,
+          y: 3 * scale,
+        };
+      case "excited":
+        return {
+          ...base,
+          height: blinkState ? 3 * scale : eyeHeight * 1.15,
+          scaleX: 1.15,
+          scaleY: blinkState ? 0.1 : 1.15,
+        };
+      case "thinking":
+        return {
+          ...base,
+          height: blinkState ? 3 * scale : eyeHeight * 0.85,
+          scaleY: blinkState ? 0.1 : 0.9,
+          y: isLeft ? -3 * scale : 3 * scale,
+          rotate: isLeft ? -8 : 0,
+        };
+      case "surprised":
+        return {
+          ...base,
+          width: eyeWidth * 1.3,
+          height: blinkState ? 3 * scale : eyeHeight * 1.3,
+          borderRadius: `${eyeRadius * 1.5}px`,
+          scaleY: blinkState ? 0.1 : 1.25,
+          scaleX: 1.25,
+        };
+      default:
+        return base;
     }
-
-    return base;
   };
 
-  const getPupilStyle = (): React.CSSProperties => {
-    const pSize = expression === "excited" ? pupilSize * 1.3 : expression === "sleepy" ? pupilSize * 0.7 : pupilSize;
-    return {
-      width: pSize,
-      height: pSize,
-      borderRadius: "50%",
-      background: "radial-gradient(circle at 35% 30%, #1a1a2e, #000)",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: `translate(calc(-50% + ${pupilOffset.x * eyeSize * 0.6}px), calc(-50% + ${pupilOffset.y * eyeSize * 0.6}px))`,
-      transition: "all 0.15s ease-out",
-      boxShadow: `0 0 ${4 * scale}px rgba(0,0,0,0.5)`,
-    };
-  };
-
-  const getHighlightStyle = (): React.CSSProperties => ({
-    width: 3 * scale,
-    height: 3 * scale,
-    borderRadius: "50%",
-    background: "#fff",
-    position: "absolute",
-    top: `calc(50% - ${3 * scale}px + ${pupilOffset.y * eyeSize * 0.3}px)`,
-    left: `calc(50% + ${1 * scale}px + ${pupilOffset.x * eyeSize * 0.3}px)`,
-    opacity: 0.9,
-    filter: `blur(${0.5 * scale}px)`,
-  });
-
-  // Cute mouth
+  // Mouth shapes
   const getMouth = () => {
-    const mouthW = 8 * scale;
-    const base: React.CSSProperties = {
+    const mouthY = sphereSize * 0.58;
+    const baseStyle: React.CSSProperties = {
       position: "absolute",
       left: "50%",
       transform: "translateX(-50%)",
-      top: eyeY + eyeSize + 5 * scale,
-      transition: "all 0.3s ease",
+      top: mouthY,
+      transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
     };
 
-    if (expression === "happy" || expression === "excited") {
-      return (
-        <div style={{
-          ...base,
-          width: mouthW,
-          height: mouthW * 0.5,
-          borderBottom: `${2 * scale}px solid rgba(255,255,255,0.6)`,
-          borderRadius: `0 0 ${mouthW}px ${mouthW}px`,
-        }} />
-      );
+    switch (currentMood) {
+      case "happy":
+      case "excited":
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{
+              ...baseStyle,
+              width: 16 * scale,
+              height: 8 * scale,
+              borderBottom: `${2 * scale}px solid ${accentColor}80`,
+              borderLeft: `${1.5 * scale}px solid transparent`,
+              borderRight: `${1.5 * scale}px solid transparent`,
+              borderRadius: `0 0 ${10 * scale}px ${10 * scale}px`,
+              filter: `drop-shadow(0 0 ${4 * scale}px ${accentColor}40)`,
+            }}
+          />
+        );
+      case "curious":
+      case "surprised":
+        return (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            style={{
+              ...baseStyle,
+              width: 6 * scale,
+              height: 7 * scale,
+              border: `${1.5 * scale}px solid ${accentColor}60`,
+              borderRadius: "50%",
+              filter: `drop-shadow(0 0 ${3 * scale}px ${accentColor}30)`,
+            }}
+          />
+        );
+      case "sleepy":
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              width: 10 * scale,
+              height: 0,
+              borderBottom: `${1.5 * scale}px solid ${accentColor}40`,
+              borderRadius: `${6 * scale}px`,
+            }}
+          />
+        );
+      case "thinking":
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              width: 10 * scale,
+              height: 5 * scale,
+              borderBottom: `${1.5 * scale}px solid ${accentColor}50`,
+              borderRadius: `0 0 0 ${8 * scale}px`,
+              transform: "translateX(-40%)",
+            }}
+          />
+        );
+      default:
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              width: 8 * scale,
+              height: 0,
+              borderBottom: `${1.5 * scale}px solid ${accentColor}35`,
+              borderRadius: `${6 * scale}px`,
+            }}
+          />
+        );
     }
-    if (expression === "curious") {
-      return (
-        <div style={{
-          ...base,
-          width: 4 * scale,
-          height: 5 * scale,
-          border: `${1.5 * scale}px solid rgba(255,255,255,0.5)`,
-          borderRadius: "50%",
-        }} />
-      );
-    }
-    if (expression === "sleepy") {
-      return (
-        <div style={{
-          ...base,
-          width: mouthW * 0.6,
-          height: 0,
-          borderBottom: `${1.5 * scale}px solid rgba(255,255,255,0.4)`,
-          borderRadius: `${mouthW}px`,
-        }} />
-      );
-    }
-    // idle - small smile
-    return (
-      <div style={{
-        ...base,
-        width: mouthW * 0.7,
-        height: mouthW * 0.3,
-        borderBottom: `${1.5 * scale}px solid rgba(255,255,255,0.45)`,
-        borderRadius: `0 0 ${mouthW}px ${mouthW}px`,
-      }} />
-    );
   };
 
-  // Blush cheeks for happy/excited
-  const showBlush = expression === "happy" || expression === "excited";
+  const showBlush = currentMood === "happy" || currentMood === "excited";
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 pointer-events-none flex items-center justify-center"
-      style={{ zIndex: 10 }}
-    >
-      <div style={{ position: "relative", marginTop: eyeY }}>
-        {/* Left eye */}
-        <div style={{ display: "inline-block", marginRight: eyeGap, ...getEyeStyle(true) }}>
-          {!blinkState && (
-            <>
-              <div style={getPupilStyle()} />
-              <div style={getHighlightStyle() as any} />
-            </>
-          )}
-        </div>
-        {/* Right eye */}
-        <div style={{ display: "inline-block", ...getEyeStyle(false) }}>
-          {!blinkState && (
-            <>
-              <div style={getPupilStyle()} />
-              <div style={getHighlightStyle() as any} />
-            </>
-          )}
-        </div>
-
-        {/* Blush */}
-        {showBlush && (
-          <>
-            <div style={{
-              position: "absolute",
-              width: 8 * scale,
-              height: 5 * scale,
-              borderRadius: "50%",
-              background: "rgba(255, 120, 150, 0.3)",
-              filter: `blur(${3 * scale}px)`,
-              left: -4 * scale,
-              top: eyeSize * 0.6,
-              transition: "opacity 0.5s",
-            }} />
-            <div style={{
-              position: "absolute",
-              width: 8 * scale,
-              height: 5 * scale,
-              borderRadius: "50%",
-              background: "rgba(255, 120, 150, 0.3)",
-              filter: `blur(${3 * scale}px)`,
-              right: -4 * scale,
-              top: eyeSize * 0.6,
-              transition: "opacity 0.5s",
-            }} />
-          </>
-        )}
-
-        {/* Mouth */}
-        {getMouth()}
-      </div>
-    </div>
-  );
-};
-
-/* ─── 3D Core (unchanged logic) ─── */
-const TwinCore = ({ level }: { level: number }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const ringRef = useRef<THREE.Mesh>(null);
-  const ring2Ref = useRef<THREE.Mesh>(null);
-
-  const normalizedLevel = Math.min(level, 99) / 99;
-  const distort = 0.2 + normalizedLevel * 0.5;
-  const speed = 1.5 + normalizedLevel * 3;
-  const complexity = Math.floor(3 + normalizedLevel * 12);
-  const particleCount = Math.floor(30 + normalizedLevel * 170);
-  const coreScale = 0.8 + normalizedLevel * 0.4;
-
-  const cyanHue = useMemo(() => new THREE.Color("#00E6DC"), []);
-  const violetHue = useMemo(() => new THREE.Color("#A050FF"), []);
-  const amberHue = useMemo(() => new THREE.Color("#FFB432"), []);
-  const coreColor = useMemo(() => {
-    if (normalizedLevel < 0.33) return cyanHue.clone().lerp(violetHue, normalizedLevel * 3);
-    if (normalizedLevel < 0.66) return violetHue.clone().lerp(amberHue, (normalizedLevel - 0.33) * 3);
-    return amberHue.clone().lerp(new THREE.Color("#FF4060"), (normalizedLevel - 0.66) * 3);
-  }, [normalizedLevel, cyanHue, violetHue, amberHue]);
-
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
-    if (meshRef.current) {
-      meshRef.current.rotation.x = Math.sin(t * 0.3) * 0.15;
-      meshRef.current.rotation.y = t * 0.1;
-    }
-    if (ringRef.current) {
-      ringRef.current.rotation.z = t * 0.4;
-      ringRef.current.rotation.x = Math.sin(t * 0.5) * 0.6;
-    }
-    if (ring2Ref.current) {
-      ring2Ref.current.rotation.z = -t * 0.3;
-      ring2Ref.current.rotation.y = Math.cos(t * 0.4) * 0.5;
-    }
-  });
-
-  const geometryDetail = normalizedLevel < 0.5 ? 1 : 2;
-
-  return (
-    <>
-      <ambientLight intensity={0.15} />
-      <pointLight position={[3, 3, 3]} intensity={0.8} color="#00E6DC" />
-      <pointLight position={[-3, -2, 2]} intensity={0.5} color="#A050FF" />
-      <pointLight position={[0, -3, -2]} intensity={0.3} color="#FFB432" />
-
-      <Float speed={2} rotationIntensity={0.2} floatIntensity={0.4}>
-        <mesh ref={meshRef} scale={coreScale}>
-          <icosahedronGeometry args={[1, geometryDetail]} />
-          <MeshDistortMaterial
-            color={coreColor}
-            emissive={coreColor}
-            emissiveIntensity={0.4 + normalizedLevel * 0.6}
-            roughness={0.15}
-            metalness={0.85}
-            distort={distort}
-            speed={speed}
-            transparent
-            opacity={0.92}
-          />
-        </mesh>
-      </Float>
-
-      {normalizedLevel > 0.1 && (
-        <mesh ref={ringRef}>
-          <torusGeometry args={[1.3 + normalizedLevel * 0.3, 0.015, 16, complexity * 3]} />
-          <meshStandardMaterial color="#00E6DC" emissive="#00E6DC" emissiveIntensity={0.8} transparent opacity={0.5 + normalizedLevel * 0.3} />
-        </mesh>
-      )}
-
-      {normalizedLevel > 0.35 && (
-        <mesh ref={ring2Ref}>
-          <torusGeometry args={[1.6 + normalizedLevel * 0.2, 0.012, 16, complexity * 2]} />
-          <meshStandardMaterial color="#A050FF" emissive="#A050FF" emissiveIntensity={0.6} transparent opacity={0.3 + normalizedLevel * 0.4} />
-        </mesh>
-      )}
-
-      <Sparkles count={particleCount} scale={3.5} size={1.5 + normalizedLevel * 2} speed={0.4 + normalizedLevel * 0.8} color={coreColor} opacity={0.6} />
-
-      {normalizedLevel > 0.5 && (
-        <Sparkles count={Math.floor(particleCount * 0.4)} scale={4} size={0.8} speed={1.2} color="#FFB432" opacity={0.4} />
-      )}
-    </>
-  );
-};
-
-const EvoTwin = ({ level = 7, size = 200, className = "", mood = "idle" }: EvoTwinProps) => {
-  return (
-    <div className={`relative ${className}`} style={{ width: size, height: size }}>
+    <div className={`flex flex-col items-center ${className}`}>
       <div
-        className="absolute inset-0 rounded-full blur-2xl opacity-30"
-        style={{
-          background: `radial-gradient(circle, hsl(var(--primary) / 0.4), hsl(var(--secondary) / 0.2), transparent)`,
-        }}
-      />
-      <Canvas
-        camera={{ position: [0, 0, 4], fov: 45 }}
-        style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true }}
+        ref={containerRef}
+        className="relative"
+        style={{ width: size, height: size }}
       >
-        <TwinCore level={level} />
-      </Canvas>
-      <EvoEyes size={size} mood={mood} />
+        {/* Ambient glow */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: sphereSize * 1.4,
+            height: sphereSize * 1.4,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: `radial-gradient(circle, ${accentColor}15, ${secondaryColor}08, transparent 70%)`,
+            filter: `blur(${20 * scale}px)`,
+          }}
+          animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Outer ring */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: sphereSize * 1.12,
+            height: sphereSize * 1.12,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            border: `1px solid ${accentColor}18`,
+            boxShadow: `0 0 ${15 * scale}px ${accentColor}08, inset 0 0 ${15 * scale}px ${accentColor}05`,
+          }}
+        />
+
+        {/* Main sphere */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: sphereSize,
+            height: sphereSize,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: `radial-gradient(ellipse 70% 60% at 35% 30%, rgba(60,65,90,0.5), rgba(20,22,35,0.95) 60%, rgba(8,10,20,1))`,
+            boxShadow: `
+              0 0 ${30 * scale}px ${accentColor}12,
+              0 ${8 * scale}px ${25 * scale}px rgba(0,0,0,0.6),
+              inset 0 ${-4 * scale}px ${20 * scale}px rgba(0,0,0,0.5),
+              inset 0 ${2 * scale}px ${8 * scale}px rgba(255,255,255,0.04)
+            `,
+            border: `1px solid rgba(255,255,255,0.06)`,
+          }}
+          animate={{ y: [0, -3 * scale, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          {/* Glass highlight */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: "45%",
+              height: "25%",
+              top: "12%",
+              left: "18%",
+              background: `linear-gradient(180deg, rgba(255,255,255,0.06), transparent)`,
+              borderRadius: "50%",
+              filter: `blur(${4 * scale}px)`,
+            }}
+          />
+
+          {/* Eyes container */}
+          <div
+            className="absolute flex items-center justify-center gap-0"
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: `translate(calc(-50% + ${pupilOffset.x * 4 * scale}px), calc(-50% + ${pupilOffset.y * 4 * scale}px - ${2 * scale}px))`,
+              gap: eyeGap,
+              transition: "transform 0.15s ease-out",
+            }}
+          >
+            {/* Left eye */}
+            <motion.div
+              animate={getEyeShape(true)}
+              transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{
+                width: getEyeShape(true).width,
+                background: `linear-gradient(180deg, ${accentColor}, ${accentColor}CC)`,
+                boxShadow: `0 0 ${12 * scale}px ${accentColor}80, 0 0 ${25 * scale}px ${accentColor}30, inset 0 ${-2 * scale}px ${4 * scale}px ${accentColor}40`,
+                borderRadius: getEyeShape(true).borderRadius,
+              }}
+            />
+            {/* Right eye */}
+            <motion.div
+              animate={getEyeShape(false)}
+              transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{
+                width: getEyeShape(false).width,
+                background: `linear-gradient(180deg, ${accentColor}, ${accentColor}CC)`,
+                boxShadow: `0 0 ${12 * scale}px ${accentColor}80, 0 0 ${25 * scale}px ${accentColor}30, inset 0 ${-2 * scale}px ${4 * scale}px ${accentColor}40`,
+                borderRadius: getEyeShape(false).borderRadius,
+              }}
+            />
+          </div>
+
+          {/* Mouth */}
+          <AnimatePresence mode="wait">{getMouth()}</AnimatePresence>
+
+          {/* Blush */}
+          {showBlush && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                className="absolute rounded-full"
+                style={{
+                  width: 14 * scale,
+                  height: 8 * scale,
+                  background: `radial-gradient(ellipse, rgba(255,100,140,0.35), transparent)`,
+                  filter: `blur(${4 * scale}px)`,
+                  left: "15%",
+                  top: "55%",
+                }}
+              />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                className="absolute rounded-full"
+                style={{
+                  width: 14 * scale,
+                  height: 8 * scale,
+                  background: `radial-gradient(ellipse, rgba(255,100,140,0.35), transparent)`,
+                  filter: `blur(${4 * scale}px)`,
+                  right: "15%",
+                  top: "55%",
+                }}
+              />
+            </>
+          )}
+        </motion.div>
+
+        {/* Orbiting dots */}
+        <OrbitDot angle={0} radius={sphereSize * 0.62} dotSize={5 * scale} color={accentColor} speed={8} delay={0} />
+        <OrbitDot angle={120} radius={sphereSize * 0.58} dotSize={4 * scale} color={secondaryColor} speed={10} delay={0.5} />
+        <OrbitDot angle={240} radius={sphereSize * 0.65} dotSize={3.5 * scale} color={accentColor} speed={12} delay={1} />
+        {normalizedLevel > 0.3 && (
+          <OrbitDot angle={60} radius={sphereSize * 0.7} dotSize={3 * scale} color={secondaryColor} speed={14} delay={2} />
+        )}
+        {normalizedLevel > 0.6 && (
+          <OrbitDot angle={180} radius={sphereSize * 0.55} dotSize={3.5 * scale} color="#FFB432" speed={9} delay={1.5} />
+        )}
+      </div>
+
+      {/* Label */}
+      {label && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-2"
+        >
+          <p className="text-sm font-mono font-bold text-foreground tracking-tight">{label}</p>
+          {sublabel && (
+            <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: `${accentColor}90` }}>
+              {sublabel}
+            </p>
+          )}
+        </motion.div>
+      )}
     </div>
   );
 };

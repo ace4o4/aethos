@@ -4,6 +4,7 @@ import EvoTwin from "@/components/EvoTwin";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
 import QuestButton from "@/components/QuestButton";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Zap, Shield, Activity, ChevronRight } from "lucide-react";
 
 const Dashboard = () => {
@@ -13,8 +14,13 @@ const Dashboard = () => {
     <div className="relative min-h-screen overflow-hidden">
       <div className="fixed inset-0 bg-background aurora-bg" />
       <div className="fixed inset-0" style={{
-        background: "radial-gradient(ellipse 50% 40% at 50% 15%, rgba(0,230,220,0.07) 0%, transparent 70%)",
+        background: "radial-gradient(ellipse 50% 40% at 50% 15%, hsl(var(--primary) / 0.07) 0%, transparent 70%)",
       }} />
+
+      {/* Theme toggle */}
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggle />
+      </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pb-24">
         {/* Header */}
@@ -41,7 +47,7 @@ const Dashboard = () => {
         {/* Quest CTA */}
         <GlassZone className="p-6 mb-4" glow="cyan" delay={0.1}>
           <div className="flex items-center gap-5">
-            <EvoTwin size={80} level={7} />
+            <EvoTwin size={80} level={7} mood="excited" />
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-1">DAILY MICRO-QUEST</p>
               <p className="text-sm font-sans text-foreground/90 mb-3">
@@ -69,9 +75,9 @@ const Dashboard = () => {
           <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-4">NEURAL EVOLUTION</p>
           <div className="space-y-3">
             {[
-              { label: "COGNITION", value: 72, color: "#00E6DC" },
-              { label: "PERCEPTION", value: 58, color: "#A050FF" },
-              { label: "SYNTHESIS", value: 41, color: "#FFB432" },
+              { label: "COGNITION", value: 72, color: "hsl(var(--primary))" },
+              { label: "PERCEPTION", value: 58, color: "hsl(var(--secondary))" },
+              { label: "SYNTHESIS", value: 41, color: "hsl(var(--accent))" },
             ].map((stat, i) => (
               <div key={stat.label}>
                 <div className="flex items-center justify-between mb-1.5">
@@ -100,10 +106,10 @@ const Dashboard = () => {
           </div>
           <div className="space-y-2.5 font-mono text-[10px] text-muted-foreground/50 leading-relaxed">
             {[
-              { time: "14:23:01", msg: "ZK-PROOF #1482 VERIFIED", icon: Shield, color: "#00E6DC" },
-              { time: "14:22:58", msg: "LOCAL WEIGHTS SYNCED TO SWARM", icon: Zap, color: "#A050FF" },
-              { time: "14:22:41", msg: "BURST TRAINING +0.0003 ETH", icon: Activity, color: "#FFB432" },
-              { time: "14:22:12", msg: "NODE_0x7F3A CONNECTED", icon: Shield, color: "#00B4FF" },
+              { time: "14:23:01", msg: "ZK-PROOF #1482 VERIFIED", icon: Shield, cls: "text-primary" },
+              { time: "14:22:58", msg: "LOCAL WEIGHTS SYNCED TO SWARM", icon: Zap, cls: "text-secondary" },
+              { time: "14:22:41", msg: "BURST TRAINING +0.0003 ETH", icon: Activity, cls: "text-accent" },
+              { time: "14:22:12", msg: "NODE_0x7F3A CONNECTED", icon: Shield, cls: "text-primary" },
             ].map((log, i) => (
               <motion.div
                 key={i}
@@ -113,7 +119,7 @@ const Dashboard = () => {
                 className="flex items-center gap-3"
               >
                 <span className="text-muted-foreground/25 mono-nums shrink-0">{log.time}</span>
-                <log.icon className="w-3 h-3 shrink-0" style={{ color: log.color, opacity: 0.5 }} />
+                <log.icon className={`w-3 h-3 shrink-0 opacity-50 ${log.cls}`} />
                 <span className="tracking-wider">{log.msg}</span>
               </motion.div>
             ))}
