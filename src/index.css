@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  .dark {
     /* Midnight Aurora — vibrant, deep, alive */
     --background: 232 45% 8%;
     --foreground: 220 30% 92%;
@@ -48,6 +49,51 @@
     --sidebar-accent-foreground: 220 30% 92%;
     --sidebar-border: 230 30% 20%;
     --sidebar-ring: 175 90% 55%;
+  }
+
+  .light {
+    /* Aurora Light — soft, airy, vibrant accents */
+    --background: 225 30% 96%;
+    --foreground: 230 25% 15%;
+
+    --card: 225 25% 98%;
+    --card-foreground: 230 25% 15%;
+
+    --popover: 225 25% 98%;
+    --popover-foreground: 230 25% 15%;
+
+    --primary: 175 85% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 275 60% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 225 20% 90%;
+    --muted-foreground: 225 15% 45%;
+
+    --accent: 35 90% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 155 70% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 225 20% 85%;
+    --input: 225 20% 85%;
+    --ring: 175 85% 38%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 225 25% 94%;
+    --sidebar-foreground: 230 25% 15%;
+    --sidebar-primary: 175 85% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 225 20% 90%;
+    --sidebar-accent-foreground: 230 25% 15%;
+    --sidebar-border: 225 20% 85%;
+    --sidebar-ring: 175 85% 38%;
   }
 }
 
