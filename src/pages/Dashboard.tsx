@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import NeuralOrb from "@/components/NeuralOrb";
+import EvoTwin from "@/components/EvoTwin";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
 import QuestButton from "@/components/QuestButton";
