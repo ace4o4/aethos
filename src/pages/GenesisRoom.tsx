@@ -2,7 +2,9 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
-import QuestButton from "@/components/QuestButton";
+import DoodleThemeToggle from "@/components/DoodleThemeToggle";
+import EvoTwin from "@/components/EvoTwin";
+import ProcessingButton from "@/components/ProcessingButton";
 
 const GenesisRoom = () => {
   const navigate = useNavigate();
@@ -10,18 +12,15 @@ const GenesisRoom = () => {
   const [audioLevels, setAudioLevels] = useState<number[]>(Array(32).fill(0.1));
   const [progress, setProgress] = useState(0);
 
-  // Simulate audio visualizer
   useEffect(() => {
     if (phase !== "recording") return;
     const interval = setInterval(() => {
       setAudioLevels(prev => prev.map(() => 0.1 + Math.random() * 0.9));
     }, 80);
-    // Auto-complete recording after 4s
     const timeout = setTimeout(() => setPhase("synthesizing"), 4000);
     return () => { clearInterval(interval); clearTimeout(timeout); };
   }, [phase]);
 
-  // Synthesizing progress
   useEffect(() => {
     if (phase !== "synthesizing") return;
     const interval = setInterval(() => {
@@ -36,7 +35,6 @@ const GenesisRoom = () => {
     return () => clearInterval(interval);
   }, [phase]);
 
-  // Navigate on complete
   useEffect(() => {
     if (phase === "complete") {
       const t = setTimeout(() => navigate("/dashboard"), 1500);
@@ -53,16 +51,26 @@ const GenesisRoom = () => {
 
   const handleStart = useCallback(() => setPhase("recording"), []);
 
+  const twinMood = useMemo(() => {
+    if (phase === "idle") return "curious" as const;
+    if (phase === "recording") return "excited" as const;
+    if (phase === "synthesizing") return "thinking" as const;
+    return "happy" as const;
+  }, [phase]);
+
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-      {/* Aurora background */}
       <div className="fixed inset-0 bg-background aurora-bg" />
       <div className="fixed inset-0" style={{
-        background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(160,80,255,0.08) 0%, transparent 70%)",
+        background: "radial-gradient(ellipse 60% 50% at 50% 50%, hsl(var(--primary) / 0.06) 0%, transparent 70%)",
       }} />
 
+      {/* Theme toggle */}
+      <div className="fixed top-5 right-5 z-50">
+        <DoodleThemeToggle />
+      </div>
+
       <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full">
-        {/* Phase: Idle */}
         <AnimatePresence mode="wait">
           {phase === "idle" && (
             <motion.div
@@ -75,15 +83,25 @@ const GenesisRoom = () => {
               <h1 className="text-2xl sm:text-3xl font-mono font-bold tracking-tighter mb-3">
                 <span className="gradient-text-aurora">GENESIS_ROOM</span>
               </h1>
-              <p className="text-sm text-muted-foreground font-sans mb-10 max-w-xs leading-relaxed">
+              <p className="text-sm text-muted-foreground font-sans mb-8 max-w-xs leading-relaxed">
                 Speak for a few seconds to create your Evo Twin's neural baseline.
               </p>
 
-              {/* Mic button with pulsing ring */}
-              <div className="relative mb-8">
+              {/* EvoTwin as mic prompt */}
+              <motion.div
+                className="mb-6 cursor-pointer"
+                onClick={handleStart}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <EvoTwin size={160} level={1} mood="curious" />
+              </motion.div>
+
+              {/* Mic pulsing ring */}
+              <div className="relative mb-6">
                 <motion.div
                   className="absolute inset-0 rounded-full"
-                  style={{ background: "conic-gradient(from 0deg, #00E6DC, #A050FF, #FFB432, #00E6DC)" }}
+                  style={{ background: "conic-gradient(from 0deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)), hsl(var(--primary)))" }}
                   animate={{ rotate: 360, scale: [1, 1.08, 1] }}
                   transition={{
                     rotate: { duration: 6, repeat: Infinity, ease: "linear" },
@@ -94,17 +112,16 @@ const GenesisRoom = () => {
                   onClick={handleStart}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative w-24 h-24 rounded-full bg-card flex items-center justify-center cursor-pointer m-[3px]"
+                  className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center cursor-pointer m-[3px]"
                 >
-                  <Mic className="w-8 h-8 text-primary" />
+                  <Mic className="w-7 h-7 text-primary" />
                 </motion.button>
               </div>
 
-              <p className="text-[10px] font-mono text-muted-foreground/50 tracking-widest">TAP TO BEGIN</p>
+              <p className="text-[10px] font-mono text-muted-foreground/50 tracking-widest">TAP TWIN OR MIC TO BEGIN</p>
             </motion.div>
           )}
 
-          {/* Phase: Recording — Audio Visualizer */}
           {phase === "recording" && (
             <motion.div
               key="recording"
@@ -116,13 +133,14 @@ const GenesisRoom = () => {
               <motion.div
                 animate={{ opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-xs font-mono text-primary tracking-widest mb-8"
+                className="text-xs font-mono text-primary tracking-widest mb-4"
               >
                 ● RECORDING
               </motion.div>
 
-              {/* Circular audio visualizer */}
-              <div className="relative w-56 h-56 mb-8">
+              <EvoTwin size={120} level={2} mood="excited" className="mb-6" />
+
+              <div className="relative w-56 h-56 mb-6">
                 <svg viewBox="0 0 200 200" className="w-full h-full">
                   {audioLevels.map((level, i) => {
                     const angle = (i / audioLevels.length) * Math.PI * 2 - Math.PI / 2;
@@ -147,12 +165,11 @@ const GenesisRoom = () => {
                       />
                     );
                   })}
-                  {/* Center dot */}
                   <circle cx="100" cy="100" r="8" fill="url(#coreGrad)" />
                   <defs>
                     <radialGradient id="coreGrad">
-                      <stop offset="0%" stopColor="#00E6DC" stopOpacity="0.9" />
-                      <stop offset="100%" stopColor="#A050FF" stopOpacity="0.3" />
+                      <stop offset="0%" stopColor="hsl(175, 90%, 55%)" stopOpacity="0.9" />
+                      <stop offset="100%" stopColor="hsl(280, 70%, 60%)" stopOpacity="0.3" />
                     </radialGradient>
                   </defs>
                 </svg>
@@ -162,7 +179,6 @@ const GenesisRoom = () => {
             </motion.div>
           )}
 
-          {/* Phase: Synthesizing */}
           {phase === "synthesizing" && (
             <motion.div
               key="synthesizing"
@@ -171,28 +187,18 @@ const GenesisRoom = () => {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center w-full"
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="w-20 h-20 rounded-full mb-8"
-                style={{
-                  background: "conic-gradient(from 0deg, #00E6DC, #A050FF, #FFB432, transparent)",
-                  mask: "radial-gradient(circle, transparent 55%, black 56%)",
-                  WebkitMask: "radial-gradient(circle, transparent 55%, black 56%)",
-                }}
-              />
+              <EvoTwin size={100} level={3} mood="thinking" className="mb-6" />
 
               <p className="text-sm font-mono text-foreground tracking-wider mb-2 gradient-text-aurora">
                 {synthLabel}
               </p>
               <p className="text-xs font-mono text-muted-foreground mono-nums mb-6">{progress}%</p>
 
-              {/* Progress bar */}
               <div className="w-full max-w-xs h-1.5 rounded-full bg-muted/30 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{
-                    background: "linear-gradient(90deg, #00E6DC, #A050FF, #FFB432)",
+                    background: "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)))",
                   }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.1 }}
@@ -201,7 +207,6 @@ const GenesisRoom = () => {
             </motion.div>
           )}
 
-          {/* Phase: Complete */}
           {phase === "complete" && (
             <motion.div
               key="complete"
@@ -209,18 +214,8 @@ const GenesisRoom = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center"
             >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.2, 1] }}
-                transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                style={{
-                  background: "linear-gradient(135deg, #00E6DC, #A050FF)",
-                  boxShadow: "0 0 40px rgba(0,230,220,0.3), 0 0 80px rgba(160,80,255,0.15)",
-                }}
-              >
-                <span className="text-3xl">✓</span>
-              </motion.div>
+              <EvoTwin size={140} level={5} mood="happy" className="mb-4" />
+
               <h2 className="text-xl font-mono font-bold tracking-tighter gradient-text-cyan">TWIN INITIALIZED</h2>
               <p className="text-xs font-mono text-muted-foreground mt-2 tracking-wider">REDIRECTING TO SWARM...</p>
             </motion.div>
