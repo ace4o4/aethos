@@ -52,48 +52,48 @@
   }
 
   .light {
-    /* Aurora Light — soft, airy, vibrant accents */
-    --background: 225 30% 96%;
-    --foreground: 230 25% 15%;
+    /* Doodle Minimal — warm paper, sketch-like feel */
+    --background: 40 30% 97%;
+    --foreground: 220 15% 20%;
 
-    --card: 225 25% 98%;
-    --card-foreground: 230 25% 15%;
+    --card: 40 25% 99%;
+    --card-foreground: 220 15% 20%;
 
-    --popover: 225 25% 98%;
-    --popover-foreground: 230 25% 15%;
+    --popover: 40 25% 99%;
+    --popover-foreground: 220 15% 20%;
 
-    --primary: 175 85% 38%;
+    --primary: 175 70% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 275 60% 55%;
+    --secondary: 270 45% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 225 20% 90%;
-    --muted-foreground: 225 15% 45%;
+    --muted: 40 15% 92%;
+    --muted-foreground: 220 10% 50%;
 
-    --accent: 35 90% 52%;
+    --accent: 30 80% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 50%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 155 70% 40%;
+    --success: 155 60% 38%;
     --success-foreground: 0 0% 100%;
 
-    --border: 225 20% 85%;
-    --input: 225 20% 85%;
-    --ring: 175 85% 38%;
+    --border: 40 15% 85%;
+    --input: 40 15% 85%;
+    --ring: 175 70% 35%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
 
-    --sidebar-background: 225 25% 94%;
-    --sidebar-foreground: 230 25% 15%;
-    --sidebar-primary: 175 85% 38%;
+    --sidebar-background: 40 20% 95%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 175 70% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 20% 90%;
-    --sidebar-accent-foreground: 230 25% 15%;
-    --sidebar-border: 225 20% 85%;
-    --sidebar-ring: 175 85% 38%;
+    --sidebar-accent: 40 15% 92%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 40 15% 85%;
+    --sidebar-ring: 175 70% 35%;
   }
 }
 
