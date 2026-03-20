@@ -52,48 +52,48 @@
   }
 
   .light {
-    /* Doodle Minimal — warm paper, sketch-like feel */
-    --background: 40 30% 97%;
-    --foreground: 220 15% 20%;
+    /* ═══ AETHOS SLEEK & PUNCHY ARCHITECTURE ═══ */
+    --background: 0 0% 98%;        /* #FAFAFA */
+    --foreground: 224 71% 4%;      /* #030712 */
 
-    --card: 40 25% 99%;
-    --card-foreground: 220 15% 20%;
+    --card: 0 0% 100%;             /* #FFFFFF */
+    --card-foreground: 224 71% 4%;
 
-    --popover: 40 25% 99%;
-    --popover-foreground: 220 15% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
 
-    --primary: 175 70% 35%;
+    --primary: 0 0% 0%;            /* Pure Black */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 45% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;       /* #F4F4F5 */
+    --secondary-foreground: 240 6% 10%;
 
-    --muted: 40 15% 92%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%; /* #71717A */
 
-    --accent: 30 80% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 189 100% 50%;        /* #00F2FE Cyan Accent */
+    --accent-foreground: 193 82% 31%; /* #0E7490 */
 
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 330 81% 60%;    /* #EC4899 Magenta Accent */
+    --destructive-foreground: 336 74% 35%; /* #9D174D */
 
-    --success: 155 60% 38%;
-    --success-foreground: 0 0% 100%;
+    --success: 53 98% 64%;         /* #FDE047 Yellow Accent */
+    --success-foreground: 39 84% 29%; /* #854D0E */
 
-    --border: 40 15% 85%;
-    --input: 40 15% 85%;
-    --ring: 175 70% 35%;
+    --border: 220 13% 91%;         /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 0 0% 0%;
 
-    --radius: 1.25rem;
+    --radius: 2rem;                /* 32px for large bento */
 
-    --sidebar-background: 40 20% 95%;
-    --sidebar-foreground: 220 15% 20%;
-    --sidebar-primary: 175 70% 35%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 224 71% 4%;
+    --sidebar-primary: 0 0% 0%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 15% 92%;
-    --sidebar-accent-foreground: 220 15% 20%;
-    --sidebar-border: 40 15% 85%;
-    --sidebar-ring: 175 70% 35%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 0 0% 0%;
   }
 }
 
@@ -103,18 +103,77 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
     font-family: 'Space Grotesk', sans-serif;
+    /* Desktop backdrop for the mobile frame */
+    background-color: #f4f4f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .dark body {
+    background-color: #09090b;
+  }
+
+  /* The Android Device Frame */
+  #root {
+    @apply bg-background;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 600px) {
+    #root {
+      width: 412px;
+      height: 850px;
+      max-height: 90vh;
+      border-radius: 36px;
+      /* Android hardware bezels */
+      border: 8px solid #000;
+      box-shadow: 
+        0 0 0 2px #3f3f46,
+        0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .light #root {
+      box-shadow: 
+        0 0 0 2px #d4d4d8,
+        0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Force full-screen elements to respect the phone container, not the browser window */
+    .min-h-screen {
+      min-height: 100% !important;
+    }
+    .h-screen {
+      height: 100% !important;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Geist Mono', monospace;
     letter-spacing: -0.04em;
   }
+
+  /* Sleek & Punchy: Light-mode typography */
+  .light h1, .light h2, .light h3 {
+    color: #030712;
+    letter-spacing: -0.05em;
+    line-height: 1.1;
+  }
 }
 
 @layer utilities {
-  /* Aurora glass — theme-aware */
+  /* Aurora glass — dark base */
   .glass-surface {
     @apply backdrop-blur-xl rounded-2xl;
     background: linear-gradient(135deg, rgba(30, 35, 70, 0.6), rgba(20, 25, 55, 0.4));
@@ -122,44 +181,38 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
+  /* ═══ SLEEK & PUNCHY LIGHT OVERRIDES ═══ */
+
   .light .glass-surface {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(250, 248, 240, 0.7));
-    border: 1.5px dashed rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    border-radius: 1.25rem;
+    background: #FFFFFF;
+    border: 1px solid rgba(229, 231, 235, 0.7);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+    border-radius: 32px;
+    backdrop-filter: none;
   }
 
   .light .glass-surface-elevated {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(250, 248, 240, 0.8));
-    border: 1.5px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-    border-radius: 1.5rem;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,1);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.04);
+    border-radius: 32px;
+    backdrop-filter: blur(40px);
   }
 
-  /* Doodle: disable aurora glow in light mode */
   .light .aurora-bg {
-    background: none !important;
+    background: #FAFAFA !important;
     animation: none !important;
   }
 
   .light .glow-cyan,
   .light .glow-amber,
   .light .glow-violet {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
   }
 
-  .light .gradient-text-aurora {
-    background: linear-gradient(135deg, hsl(175, 70%, 35%), hsl(270, 45%, 50%), hsl(30, 80%, 50%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .light .gradient-text-cyan {
-    background: linear-gradient(135deg, hsl(175, 70%, 35%), hsl(200, 60%, 40%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* Sleek snappy interaction */
+  .sleek-transition {
+    transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .glass-surface-elevated {
@@ -282,4 +335,14 @@
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
+}
+
+/* Light-mode scrollbar */
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Serenity snappy micro-interaction */
+.serenity-transition {
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
 }
