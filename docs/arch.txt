@@ -1,0 +1,66 @@
+1. The Presentation Layer (Client)
+
+Next.js 15 (App Router): The core PWA shell providing the glassmorphic UI.
+
+Privy: Handles invisible embedded wallet creation via email/social login.
+
+2. The Orchestration Layer (Agent Memory)
+
+Letta API: Manages the "Evo Twin's" state. It handles the context window and the Replay Buffer (mixing new daily data with old baseline data to prevent Catastrophic Forgetting).
+
+3. The Execution Layer (On-Device ML)
+
+TensorFlow.js Lite & MediaPipe: Runs the heavily quantized (int8) base models directly inside the mobile browser. This is where the 30-second "Burst Training" happens.
+
+4. The Security & Settlement Layer (ZK & Network)
+
+Differential Privacy Engine: A local utility function that injects mathematical noise into the newly trained weights.
+
+StarkWare S-two Prover: Generates a cryptographic proof that the local training was executed correctly.
+
+rust-libp2p (WebTransport): The peer-to-peer gossip protocol that broadcasts the proof and the noisy weights to other phones (nodes) in the swarm.
+
+🔄 The Core Data Flow (Step-by-Step Lifecycle)
+Here is exactly what happens to the data when a user interacts with the app. You can use this flow directly if the judges ask, "How does the data actually move?"
+
+Phase A: Initialization
+
+User logs in: Privy creates an embedded wallet (Key sharding secures it).
+
+Voice Prompt: User speaks a 5-second initialization prompt.
+
+Agent Spawned: Letta creates a new memory profile linked to the Privy wallet ID. The base ML model is loaded into the browser's IndexedDB.
+
+Phase B: The Daily Loop (Data Capture & Compute)
+4.  Micro-Quest Triggered: The UI asks the user for a 30-second task (e.g., photo or text).
+5.  Data Ingestion: The data is captured by the PWA but never sent to an external API. It stays in the device's volatile memory.
+6.  Burst Training: TensorFlow.js uses the new data + Letta's replay buffer to fine-tune the local model weights.
+7.  Data Purge: Once the new weights are calculated, the raw image/audio data is permanently deleted from the phone's memory.
+
+Phase C: Swarm Sync (Securing the Network)
+8.  Noise Injection: The system applies Differential Privacy noise to the new model weights. (Even if someone intercepts them, they cannot reverse-engineer the user's data).
+9.  Proof Generation: The StarkWare S-two protocol generates a ZK-proof verifying the compute was valid.
+10. Broadcast: libp2p broadcasts a payload containing [ZK-Proof + Noisy Weights] to the decentralized swarm.
+11. Global Update: Other nodes verify the proof and average the new weights into their local models (Federated Learning).
+
+🗺️ Visual Flow Map (For your reference)
+Plaintext
+[ User Interface (Next.js) ]
+       │
+       ▼ (No Seed Phrase)
+[ Auth & Key Mgmt (Privy) ]
+       │
+       ▼ (Local Data Capture)
+[ Agent State (Letta) ] ───────┐
+       │                       │ (Replay Buffer)
+       ▼                       ▼
+[ On-Device ML (TF.js) ] ◄─────┘
+       │
+       ▼ (Raw weights generated)
+[ Differential Privacy ] (Noise Injected)
+       │
+       ▼
+[ StarkWare S-two ] (ZK Proof Generated)
+       │
+       ▼ (Broadcast Payload)
+[ Decentralized Swarm (libp2p) ]

@@ -1,0 +1,88 @@
+
+1. Executive Summary
+Aethos is a decentralized, mobile-first Progressive Web App (PWA) that deploys an on-device Agentic AI swarm. It leverages Zero-Knowledge Federated Learning (ZK-FL) combined with gamified daily micro-tasks to train AI agents ("Evo Twins") locally. Aethos transforms passive smartphone users into active, privacy-protected nodes of a planetary-scale superintelligence, ensuring raw data never leaves the user's device.
+
+2. Problem Statement & Market Friction
+The current AI ecosystem is hindered by a strict privacy-utility tradeoff:
+
+Centralized Data Silos: Cloud-based AI models rely on ingesting raw, private telemetry, severely compromising user privacy.
+
+Edge Hardware Degradation: Attempting continuous, localized machine learning causes aggressive thermal throttling and rapid battery drain on mobile consumer hardware.
+
+Federated Learning Vulnerabilities: Standard federated learning requires sharing model weights, leaving networks exposed to gradient inversion attacks where adversaries can mathematically reconstruct private training data.
+
+3. Core Value Proposition
+Aethos eliminates these friction points by implementing "Burst Training"—a hyper-optimized, time-boxed local fine-tuning mechanism. Security is guaranteed through Differential Privacy (adaptive noise injection) and Zero-Knowledge Proofs (StarkWare S-two), proving computational honesty without exposing underlying data patterns.
+
+4. Functional Requirements & Core User Flows
+4.1 Frictionless Onboarding (The Gateway)
+Requirement: Users must be able to join the swarm with zero Web3 friction.
+
+Execution: Integration of embedded wallet infrastructure. Traditional logins (email/social) automatically generate cryptographic key shards in the background. No seed phrases are exposed to the user.
+
+Initialization: A single 5-second voice or text prompt initializes the user's blank neural network ("Evo Twin").
+
+4.2 The Core Loop (Daily Micro-Quests)
+Requirement: Continuous learning without overwhelming the user or the hardware.
+
+Execution: The engine surfaces one 30-second context-aware task per day (e.g., visual environment capture or auditory calibration).
+
+Gamification: Completion triggers an immediate, high-fidelity "neural growth" UI animation to provide a dopamine-driven feedback loop.
+
+4.3 On-Device Burst Training
+Requirement: Train the model locally without thermal throttling.
+
+Execution: Execution of highly quantized models (int8) strictly within the browser environment. Training occurs in high-speed, sub-30-second bursts.
+
+Memory Management: Implementation of a compressed replay buffer to mix new daily data with historical baselines, preventing Catastrophic Forgetting.
+
+4.4 Privacy-Preserving Swarm Sync
+Requirement: Sync intelligence across the network securely.
+
+Execution: 1. Extract local weights post-training.
+2. Inject sample-specific adaptive noise (Differential Privacy) to neutralize model inversion risks.
+3. Generate a cryptographic proof of the computation.
+4. Broadcast the proof and obfuscated weights via a decentralized P2P network.
+
+5. Technical Architecture & Tech Stack
+5.1 Frontend & Orchestration
+Framework: Next.js 15 (App Router) configured as a Progressive Web App (PWA).
+
+Styling: Tailwind CSS, Framer Motion (for fluid micro-interactions).
+
+Agent State Management: Letta API for multi-agent state management, context window handling, and memory architecture.
+
+5.2 Machine Learning (On-Device)
+Frameworks: TensorFlow.js Lite, MediaPipe LLM Inference API.
+
+Constraints: Models must be strictly quantized to run smoothly in mobile browser environments.
+
+5.3 Web3 & Security Infrastructure
+Authentication: Privy (Embedded wallets, multi-party computation for key sharding).
+
+P2P Networking: rust-libp2p compiled to WebAssembly (Wasm) with WebTransport support for direct mobile-to-mobile node discovery.
+
+Cryptography: StarkWare S-two prover. Operates over a 31-bit Mersenne prime field, optimized for rapid proof generation on consumer-grade hardware.
+
+6. UI/UX & Design System Requirements
+Theme: Deep Dark Mode (Backgrounds: #000000 to #0A0A12) to minimize battery consumption during training.
+
+Aesthetic: Premium Glassmorphism. Semi-transparent cards with heavy background blurs and subtle 1px neon borders.
+
+Color Accents: Vibrant Cyan (#00F2FE) to Deep Purple (#7F00FF) gradients to highlight active AI states and primary call-to-action buttons.
+
+Typography: Geometric sans-serifs (Space Grotesk or Outfit for headers, Inter for data points).
+
+7. Success Metrics (MVP KPIs)
+Time-to-Initialize: < 10 seconds from app launch to Evo Twin creation.
+
+Burst Training Duration: < 30 seconds per daily quest to prevent hardware strain.
+
+User Retention: Daily active completion rate of the 30-second micro-quests.
+
+8. Future Roadmap: The Intelligence Economy (Post-Hackathon)
+Phase 2: Decentralized Intelligence Marketplace launch.
+
+Phase 3: Smart contract integration allowing top-performing Evo Twins to be anonymously cloned or merged.
+
+Phase 4: On-chain financial rewards for data nodes contributing high-quality, real-world baseline models to the global swarm.

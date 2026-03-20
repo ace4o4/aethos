@@ -1,0 +1,26 @@
+1. Frontend & Presentation Layer (The UI/UX)
+Next.js 15 (App Router): * Why: Fast, server-side rendering, aur seamless Progressive Web App (PWA) setup ke liye. Yeh ensure karega ki Aethos browser mein chalne ke bawajood ek native iOS/Android app jaisi feel de.
+
+Tailwind CSS: * Why: Rapid styling aur custom dark-theme/glassmorphism UI banane ke liye bina bhari CSS files likhe.
+
+Framer Motion: * Why: Micro-interactions aur "neural growth" wale fluid animations ke liye, jo user ko daily micro-quests complete karne par dopamine hit denge.
+
+2. Authentication & Wallet Infrastructure
+Privy: * Why: Decentralized apps (dApps) ka sabse bada friction seed phrases hote hain.
+Privy users ko unke Google/Apple account se login karne deta hai aur background mein invisibly ek embedded crypto wallet (using key sharding) create kar deta hai.
+100% anonymous, zero friction.
+
+3. On-Device AI & Orchestration (The Engine)
+TensorFlow.js Lite & MediaPipe LLM Inference API: * Why: Cloud API costs bachane aur data local rakhne ke liye.
+Hum strictly quantized (int8) lightweight models use karenge jo browser ke andar chalenge,
+taaki phone ki battery drain na ho aur thermal throttling na aaye ("Burst Training").
+
+Letta API: * Why: AI agent ki memory aur state ko manage karne ke liye. Letta ka "Replay Buffer" system naye data ko purane baseline data ke saath mix karta hai, jisse AI past learning ko nahi bhoolta (defeating Catastrophic Forgetting).
+
+4. Networking & Decentralization (The Swarm)
+rust-libp2p (Compiled to WebAssembly/Wasm): * Why: P2P (Peer-to-Peer) node discovery ke liye. Iske WebTransport support se do mobile phones directly ek dusre se encrypted model weights aur proofs share kar sakte hain, bina kisi central server ke beech mein aaye.
+
+5. Cryptography & Security (The Shield)
+Differential Privacy (Custom Algorithm Logic): * Why: Sirf weights share karne se hackers data reconstruct kar sakte hain (Model Inversion Attack). Yeh algorithm weights network par bhejne se pehle unme ek mathematical "noise" inject karega, making data reconstruction mathematically impossible.
+
+StarkWare S-two Prover: * Why: Standard Zero-Knowledge (ZK) provers phones par bohot slow hote hain. S-two ek 31-bit Mersenne prime field use karta hai, jo mobile hardware ke hisaab se heavily optimized hai aur computation ko verify karne ke fast, lightweight proofs generate karta hai.
