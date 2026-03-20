@@ -65,12 +65,12 @@ const GenesisRoom = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-      <div className="fixed inset-0 bg-background aurora-bg" />
-      <div className="fixed inset-0" style={{
+      <div className="absolute inset-0 bg-background aurora-bg" />
+      <div className="absolute inset-0" style={{
         background: "radial-gradient(ellipse 60% 50% at 50% 50%, hsl(var(--primary) / 0.06) 0%, transparent 70%)",
       }} />
 
-      <div className="fixed top-5 right-5 z-50">
+      <div className="absolute top-5 right-5 z-50">
         <DoodleThemeToggle />
       </div>
 

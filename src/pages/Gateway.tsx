@@ -17,13 +17,13 @@ const Gateway = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-      <div className="fixed inset-0 bg-background aurora-bg" />
-      <div className="fixed inset-0" style={{
+      <div className="absolute inset-0 bg-background aurora-bg" />
+      <div className="absolute inset-0" style={{
         background: "radial-gradient(ellipse 70% 50% at 50% 45%, hsl(var(--primary) / 0.08) 0%, hsl(var(--secondary) / 0.04) 40%, transparent 70%)",
       }} />
 
       {/* Doodle decorations (light mode only) */}
-      <div className="fixed inset-0 pointer-events-none doodle-decorations opacity-0 light:opacity-100">
+      <div className="absolute inset-0 pointer-events-none doodle-decorations opacity-0 light:opacity-100">
         <svg className="absolute top-10 left-10 w-16 h-16 text-muted-foreground/10" viewBox="0 0 60 60">
           <circle cx="30" cy="30" r="25" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" />
         </svg>
@@ -36,12 +36,12 @@ const Gateway = () => {
       </div>
 
       {/* Theme toggle */}
-      <div className="fixed top-5 right-5 z-50">
+      <div className="absolute top-5 right-5 z-50">
         <DoodleThemeToggle />
       </div>
 
       {/* Hex data stream */}
-      <div className="fixed top-0 left-8 opacity-[0.03] font-mono text-[10px] leading-4 select-none pointer-events-none overflow-hidden h-full">
+      <div className="absolute top-0 left-8 opacity-[0.03] font-mono text-[10px] leading-4 select-none pointer-events-none overflow-hidden h-full">
         {[...Array(40)].map((_, i) => (
           <motion.div
             key={i}

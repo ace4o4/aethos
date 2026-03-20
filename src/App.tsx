@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import SplashScreen from "@/components/SplashScreen";
 import Gateway from "./pages/Gateway.tsx";
 import GenesisRoom from "./pages/GenesisRoom.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
+import Dashboard from "./pages/DashboardRouter.tsx";
 import MicroQuest from "./pages/MicroQuest.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
