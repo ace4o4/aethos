@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import EvoTwin from "@/components/EvoTwin";
-import QuestButton from "@/components/QuestButton";
-import ThemeToggle from "@/components/ThemeToggle";
+import DoodleThemeToggle from "@/components/DoodleThemeToggle";
+import ProcessingButton from "@/components/ProcessingButton";
+import StatusBadge from "@/components/StatusBadge";
 import { useNavigate } from "react-router-dom";
 
 const Gateway = () => {
@@ -9,7 +10,6 @@ const Gateway = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-      {/* Aurora background */}
       <div className="fixed inset-0 bg-background aurora-bg" />
       <div className="fixed inset-0" style={{
         background: "radial-gradient(ellipse 70% 50% at 50% 45%, hsl(var(--primary) / 0.08) 0%, hsl(var(--secondary) / 0.04) 40%, transparent 70%)",
@@ -17,7 +17,7 @@ const Gateway = () => {
 
       {/* Theme toggle */}
       <div className="fixed top-5 right-5 z-50">
-        <ThemeToggle />
+        <DoodleThemeToggle />
       </div>
 
       {/* Hex data stream */}
@@ -69,27 +69,20 @@ const Gateway = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <QuestButton onClick={() => navigate("/genesis")}>
-            <span className="gradient-text-cyan font-semibold">INITIALIZE VIA PRIVY</span>
-            <motion.span
-              className="inline-block w-2 h-2 rounded-full bg-primary"
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </QuestButton>
+          <ProcessingButton variant="primary" onClick={() => navigate("/genesis")}>
+            INITIALIZE VIA PRIVY
+          </ProcessingButton>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="mt-16 flex items-center gap-6 text-[10px] font-mono text-muted-foreground/40 tracking-widest"
+          className="mt-16 flex items-center gap-4"
         >
-          <span>ZK-FL v0.9.1</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span>NODES: 2,847</span>
-          <span className="w-1 h-1 rounded-full bg-primary/50" />
-          <span>LATENCY: 14ms</span>
+          <StatusBadge label="ZK-FL v0.9.1" variant="neutral" pulse={false} />
+          <StatusBadge label="NODES: 2,847" variant="active" />
+          <StatusBadge label="14ms" variant="success" pulse={false} />
         </motion.div>
       </div>
     </div>

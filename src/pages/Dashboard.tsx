@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import EvoTwin from "@/components/EvoTwin";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
-import QuestButton from "@/components/QuestButton";
-import ThemeToggle from "@/components/ThemeToggle";
+import DoodleThemeToggle from "@/components/DoodleThemeToggle";
+import ProcessingButton from "@/components/ProcessingButton";
+import PremiumCard from "@/components/PremiumCard";
+import StatusBadge from "@/components/StatusBadge";
 import { Zap, Shield, Activity, ChevronRight } from "lucide-react";
 
 const Dashboard = () => {
@@ -19,7 +21,7 @@ const Dashboard = () => {
 
       {/* Theme toggle */}
       <div className="fixed top-5 right-5 z-50">
-        <ThemeToggle />
+        <DoodleThemeToggle />
       </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pb-24">
@@ -34,33 +36,30 @@ const Dashboard = () => {
             <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">SWARM_DASHBOARD</p>
             <h1 className="text-xl font-mono font-bold tracking-tighter gradient-text-aurora">EVO_AEGIS</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <motion.span
-              className="w-2 h-2 rounded-full bg-success"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-[10px] font-mono text-success">ONLINE</span>
-          </div>
+          <StatusBadge label="ONLINE" variant="success" />
         </motion.div>
 
         {/* Quest CTA */}
-        <GlassZone className="p-6 mb-4" glow="cyan" delay={0.1}>
+        <PremiumCard variant="gradient" glow="cyan" delay={0.1} className="mb-4">
           <div className="flex items-center gap-5">
             <EvoTwin size={80} level={7} mood="excited" />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-1">DAILY MICRO-QUEST</p>
+              <StatusBadge label="DAILY QUEST" variant="pending" className="mb-2" />
               <p className="text-sm font-sans text-foreground/90 mb-3">
                 Capture a 30-second sample to evolve your twin.
               </p>
-              <QuestButton className="w-full" onClick={() => navigate("/quest")}>
-                <Zap className="w-4 h-4 text-primary" />
+              <ProcessingButton
+                variant="ghost"
+                onClick={() => navigate("/quest")}
+                className="w-full"
+                icon={<Zap className="w-4 h-4 text-primary" />}
+              >
                 <span className="gradient-text-cyan text-xs font-semibold">BEGIN BURST TRAINING</span>
                 <ChevronRight className="w-3 h-3 text-muted-foreground" />
-              </QuestButton>
+              </ProcessingButton>
             </div>
           </div>
-        </GlassZone>
+        </PremiumCard>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -71,8 +70,14 @@ const Dashboard = () => {
         </div>
 
         {/* Evolution */}
-        <GlassZone className="p-5 mb-4" delay={0.6}>
-          <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase mb-4">NEURAL EVOLUTION</p>
+        <PremiumCard
+          variant="default"
+          delay={0.6}
+          className="mb-4"
+          header={
+            <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">NEURAL EVOLUTION</p>
+          }
+        >
           <div className="space-y-3">
             {[
               { label: "COGNITION", value: 72, color: "hsl(var(--primary))" },
@@ -96,14 +101,19 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </GlassZone>
+        </PremiumCard>
 
         {/* Activity */}
-        <GlassZone className="p-5" delay={0.8}>
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="w-3 h-3 text-primary" />
-            <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">SWARM ACTIVITY</p>
-          </div>
+        <PremiumCard
+          variant="outlined"
+          delay={0.8}
+          header={
+            <div className="flex items-center gap-2">
+              <Activity className="w-3 h-3 text-primary" />
+              <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">SWARM ACTIVITY</p>
+            </div>
+          }
+        >
           <div className="space-y-2.5 font-mono text-[10px] text-muted-foreground/50 leading-relaxed">
             {[
               { time: "14:23:01", msg: "ZK-PROOF #1482 VERIFIED", icon: Shield, cls: "text-primary" },
@@ -124,7 +134,7 @@ const Dashboard = () => {
               </motion.div>
             ))}
           </div>
-        </GlassZone>
+        </PremiumCard>
 
         <motion.div
           initial={{ opacity: 0 }}
