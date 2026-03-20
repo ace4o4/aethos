@@ -4,9 +4,16 @@ import DoodleThemeToggle from "@/components/DoodleThemeToggle";
 import ProcessingButton from "@/components/ProcessingButton";
 import StatusBadge from "@/components/StatusBadge";
 import { useNavigate } from "react-router-dom";
+import { playClick, playWhoosh } from "@/lib/sounds";
 
 const Gateway = () => {
   const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    playClick();
+    playWhoosh();
+    navigate("/genesis");
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
@@ -14,6 +21,19 @@ const Gateway = () => {
       <div className="fixed inset-0" style={{
         background: "radial-gradient(ellipse 70% 50% at 50% 45%, hsl(var(--primary) / 0.08) 0%, hsl(var(--secondary) / 0.04) 40%, transparent 70%)",
       }} />
+
+      {/* Doodle decorations (light mode only) */}
+      <div className="fixed inset-0 pointer-events-none doodle-decorations opacity-0 light:opacity-100">
+        <svg className="absolute top-10 left-10 w-16 h-16 text-muted-foreground/10" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="25" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" />
+        </svg>
+        <svg className="absolute bottom-20 right-16 w-12 h-12 text-muted-foreground/10" viewBox="0 0 40 40">
+          <path d="M5 35 L20 5 L35 35 Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
+        </svg>
+        <svg className="absolute top-1/3 right-8 w-8 h-8 text-primary/15" viewBox="0 0 30 30">
+          <path d="M15 2 L18 12 L28 12 L20 18 L23 28 L15 22 L7 28 L10 18 L2 12 L12 12 Z" fill="currentColor" />
+        </svg>
+      </div>
 
       {/* Theme toggle */}
       <div className="fixed top-5 right-5 z-50">
@@ -41,7 +61,7 @@ const Gateway = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <EvoTwin size={240} level={1} mood="curious" label="Evo-1X" sublabel="INITIALIZATION" />
+          <EvoTwin size={240} level={1} mood="curious" interactive label="Evo-1X" sublabel="INITIALIZATION" />
         </motion.div>
 
         <motion.h1
@@ -69,7 +89,7 @@ const Gateway = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <ProcessingButton variant="primary" onClick={() => navigate("/genesis")}>
+          <ProcessingButton variant="primary" onClick={handleNavigate}>
             INITIALIZE VIA PRIVY
           </ProcessingButton>
         </motion.div>

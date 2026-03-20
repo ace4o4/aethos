@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import EvoTwin from "@/components/EvoTwin";
 import GlassZone from "@/components/GlassZone";
 import StatWidget from "@/components/StatWidget";
@@ -8,9 +9,22 @@ import ProcessingButton from "@/components/ProcessingButton";
 import PremiumCard from "@/components/PremiumCard";
 import StatusBadge from "@/components/StatusBadge";
 import { Zap, Shield, Activity, ChevronRight } from "lucide-react";
+import { playClick, playWhoosh, startAmbientHum } from "@/lib/sounds";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // Ambient hum on dashboard
+  useEffect(() => {
+    const stopHum = startAmbientHum();
+    return stopHum;
+  }, []);
+
+  const handleQuest = () => {
+    playClick();
+    playWhoosh();
+    navigate("/quest");
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -42,7 +56,7 @@ const Dashboard = () => {
         {/* Quest CTA */}
         <PremiumCard variant="gradient" glow="cyan" delay={0.1} className="mb-4">
           <div className="flex items-center gap-5">
-            <EvoTwin size={80} level={7} mood="excited" />
+            <EvoTwin size={80} level={7} mood="excited" interactive />
             <div className="flex-1 min-w-0">
               <StatusBadge label="DAILY QUEST" variant="pending" className="mb-2" />
               <p className="text-sm font-sans text-foreground/90 mb-3">
@@ -50,7 +64,7 @@ const Dashboard = () => {
               </p>
               <ProcessingButton
                 variant="ghost"
-                onClick={() => navigate("/quest")}
+                onClick={handleQuest}
                 className="w-full"
                 icon={<Zap className="w-4 h-4 text-primary" />}
               >
