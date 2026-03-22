@@ -5,7 +5,6 @@
 ---
 
 
-
 ## What Is This?
 
 Aethos is a **mobile-first Progressive Web App (PWA)** where every user births and raises a personal AI agent called an **Evo Twin**. The twin trains entirely on-device using your daily inputs (text, camera, motion) and then contributes anonymously to a global AI swarm via Zero-Knowledge proofs — **zero raw data ever leaves your phone**.
