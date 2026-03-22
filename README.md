@@ -2,7 +2,7 @@
 
 > *"Your phone trains a personal AI. That AI secretly makes humanity smarter — without ever sharing your data."*
 
---
+-
 
 
 ## What Is This?
