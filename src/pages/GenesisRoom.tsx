@@ -39,7 +39,7 @@ const GenesisRoom = () => {
 
   useEffect(() => {
     if (phase === "complete") {
-      const t = setTimeout(() => { playWhoosh(); navigate("/dashboard"); }, 1500);
+      const t = setTimeout(() => { playWhoosh(); navigate("/home"); }, 1500);
       return () => clearTimeout(t);
     }
   }, [phase, navigate]);
