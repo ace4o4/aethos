@@ -1,88 +1,175 @@
+FOCUS TWIN — Product Requirements Document
+============================================
 
 1. Executive Summary
-Aethos is a decentralized, mobile-first Progressive Web App (PWA) that deploys an on-device Agentic AI swarm. It leverages Zero-Knowledge Federated Learning (ZK-FL) combined with gamified daily micro-tasks to train AI agents ("Evo Twins") locally. Aethos transforms passive smartphone users into active, privacy-protected nodes of a planetary-scale superintelligence, ensuring raw data never leaves the user's device.
+--------------------
+Focus Twin is a mobile-first Progressive Web App (PWA) that gives every user a personal AI productivity companion — their "Evo Twin." The twin lives entirely on-device, learns the user's unique focus patterns, and provides personalized coaching to help them build sustainable deep work habits. No data ever leaves the user's phone. Revenue comes from a freemium model (₹149/month premium).
 
-2. Problem Statement & Market Friction
-The current AI ecosystem is hindered by a strict privacy-utility tradeoff:
 
-Centralized Data Silos: Cloud-based AI models rely on ingesting raw, private telemetry, severely compromising user privacy.
+2. Problem Statement
+--------------------
+The productivity tool market is split into two broken camps:
 
-Edge Hardware Degradation: Attempting continuous, localized machine learning causes aggressive thermal throttling and rapid battery drain on mobile consumer hardware.
+A) Dumb Timers (Forest, Pomodoro apps)
+   - Set a timer, stare at it, done
+   - Zero intelligence — doesn't learn you, doesn't adapt
+   - No insights — "you focused for 25 minutes" tells you nothing useful
+   - Result: novelty wears off in 1-2 weeks
 
-Federated Learning Vulnerabilities: Standard federated learning requires sharing model weights, leaving networks exposed to gradient inversion attacks where adversaries can mathematically reconstruct private training data.
+B) Surveillance Dashboards (RescueTime, Rize, ActivTrak)
+   - Track every app, every website, every second
+   - Upload everything to cloud servers
+   - Feel invasive — users describe them as "creepy"
+   - Show data without actionable advice — "you spent 4 hours on YouTube" — so what?
+   - Privacy risk: your entire digital behavior on someone's server
 
-3. Core Value Proposition
-Aethos eliminates these friction points by implementing "Burst Training"—a hyper-optimized, time-boxed local fine-tuning mechanism. Security is guaranteed through Differential Privacy (adaptive noise injection) and Zero-Knowledge Proofs (StarkWare S-two), proving computational honesty without exposing underlying data patterns.
+The Gap: Nobody offers an intelligent, private, emotionally engaging focus companion that learns YOUR patterns and tells you what to actually DO differently.
 
-4. Functional Requirements & Core User Flows
-4.1 Frictionless Onboarding (The Gateway)
-Requirement: Users must be able to join the swarm with zero Web3 friction.
 
-Execution: Integration of embedded wallet infrastructure. Traditional logins (email/social) automatically generate cryptographic key shards in the background. No seed phrases are exposed to the user.
+3. Target Users
+---------------
+Primary: Students (18-25) preparing for exams, placements, competitive coding
+   - Pain: Constant distraction, guilt cycle, no structured focus system
+   - Willingness to pay: Already spending on Forest, productivity courses
+   - Scale: 50M+ students in India alone actively seeking productivity tools
 
-Initialization: A single 5-second voice or text prompt initializes the user's blank neural network ("Evo Twin").
+Secondary: Remote workers / freelancers (22-35)
+   - Pain: No office structure, work-from-home distractions, burnout
+   - Willingness to pay: Already using Notion, Todoist, calendar tools
+   - Scale: 300M+ remote workers globally post-COVID
 
-4.2 The Core Loop (Daily Micro-Quests)
-Requirement: Continuous learning without overwhelming the user or the hardware.
 
-Execution: The engine surfaces one 30-second context-aware task per day (e.g., visual environment capture or auditory calibration).
+4. Core Value Proposition
+-------------------------
+"Your AI twin that learns how YOU focus — privately, on your phone, getting smarter every day."
 
-Gamification: Completion triggers an immediate, high-fidelity "neural growth" UI animation to provide a dopamine-driven feedback loop.
+Three pillars:
+1. INTELLIGENT — Not a dumb timer. An AI agent learns your patterns, coaches you in natural language.
+2. PRIVATE — Data stays on-device. AI coaching uses only computed stats, never raw data.
+3. ALIVE — An animated AI companion that speaks, adapts, and grows with you.
 
-4.3 On-Device Burst Training
-Requirement: Train the model locally without thermal throttling.
 
-Execution: Execution of highly quantized models (int8) strictly within the browser environment. Training occurs in high-speed, sub-30-second bursts.
+5. Functional Requirements & User Flows
+-----------------------------------------
 
-Memory Management: Implementation of a compressed replay buffer to mix new daily data with historical baselines, preventing Catastrophic Forgetting.
+5.1 Onboarding (< 30 seconds)
+   - App opens → Animated splash → "Meet your Focus Twin"
+   - Quick setup: Name your twin (optional), pick your goal (study/work/create)
+   - No signup required — app works immediately with local storage
+   - Optional: Email/Google login for cross-device sync (encrypted, E2E)
 
-4.4 Privacy-Preserving Swarm Sync
-Requirement: Sync intelligence across the network securely.
+5.2 Home Dashboard
+   - Twin avatar center screen with current mood (idle/focused/celebrating/tired)
+   - AI-GENERATED GREETING: Twin speaks a personalized message based on your patterns,
+     streak, time of day, and recent trend (powered by LLM agent — see arch.txt)
+     Example: "Afternoon! Your 2pm slot is usually golden — ready to crush it?"
+   - Today's challenge card (AI-generated, adapts to your history)
+   - Quick stats: Today's focus time, current streak, weekly trend
+   - "Start Focus" button — primary CTA
 
-Execution: 1. Extract local weights post-training.
-2. Inject sample-specific adaptive noise (Differential Privacy) to neutralize model inversion risks.
-3. Generate a cryptographic proof of the computation.
-4. Broadcast the proof and obfuscated weights via a decentralized P2P network.
+5.3 Focus Session
+   - Tap "Start Focus" → Full-screen focus mode
+   - Twin enters focus animation (meditating/working pose)
+   - Optional: Ambient sounds (rain, lo-fi, white noise, cafe)
+   - Minimal UI: Timer + twin + "End Session" button
+   - No distracting stats during session — just you and your twin
+   - Session ends naturally or when user taps "End"
 
-5. Technical Architecture & Tech Stack
-5.1 Frontend & Orchestration
-Framework: Next.js 15 (App Router) configured as a Progressive Web App (PWA).
+5.4 Post-Session Feedback (AI Agent Powered)
+   - AI-GENERATED celebration message based on session stats + user history:
+     "47 minutes on a Wednesday! That's 10 more than your usual mid-week. Keep it up! 🔥"
+   - Quick reflection prompt (optional): "How was that session?" (Great / Okay / Tough)
+   - AI-GENERATED insight card: personalized coaching based on patterns:
+     "You focus best 2-5pm. Tomorrow's a Thursday — historically your strongest day.
+      Let's aim for 55 minutes."
+   - Twin earns XP → visual growth animation
+   - All AI responses generated from computed stats only (never raw data)
+   - Falls back to template responses if no LLM available
 
-Styling: Tailwind CSS, Framer Motion (for fluid micro-interactions).
+5.5 Insights & Analytics (Key Differentiator)
+   - Daily: Focus time, session count, best streak, mood correlation
+   - Weekly: Pattern chart — which days/hours are your peak focus times
+   - Monthly: Trend analysis — "Your average focus streak grew from 25 to 42 minutes"
+   - AI Insights (powered by Twin Agent):
+     * "You lose focus after 3+ meetings — try a 10-minute walk between meetings"
+     * "Your Monday mornings are 60% more productive than Friday afternoons"
+     * "When you rate sessions as 'Tough', you usually recover by taking a 20-minute break"
+   - All data processed and stored locally. Never leaves device.
 
-Agent State Management: Letta API for multi-agent state management, context window handling, and memory architecture.
+5.5b Chat Mode (Premium — Talk to Your Twin)
+   - User can ask their twin anything about their focus patterns:
+     User: "Why can't I focus after 5pm?"
+     Twin: "Looking at your data — focus drops 60% after 5pm. But on days when you
+            take a break between 4-5pm, your evening sessions are 40% better.
+            Try a walk at 4:30?"
+   - Twin has memory of past conversations (stored locally in IndexedDB)
+   - Twin personality adapts to your coaching preferences (motivational/analytical/gentle)
+   - LLM receives only computed stats + chat history, never raw session data
 
-5.2 Machine Learning (On-Device)
-Frameworks: TensorFlow.js Lite, MediaPipe LLM Inference API.
+5.6 Twin Evolution System
+   - Twin starts as basic avatar with 3 moods (idle, focus, celebrate)
+   - Level up through consistent focus sessions:
+     * Level 1 (Day 1): Basic twin, 3 moods, template responses
+     * Level 5 (Week 1): New mood animations, particle effects, AI greetings unlock
+     * Level 10 (Week 2): Twin speaks AI insights, personality traits emerge
+     * Level 15 (Week 3): Predictive coaching unlocks ("tomorrow looks like a good focus day")
+     * Level 20 (Month 1): Full personality, chat mode unlocks, advanced animations
+   - Streak bonuses: 7-day streak → special twin animation, 30-day → rare visual upgrade
+   - Twin personality evolves: starts generic, becomes uniquely yours over time
+   - This creates switching cost: "My twin KNOWS me after 3 months — I can't start over"
 
-Constraints: Models must be strictly quantized to run smoothly in mobile browser environments.
+5.7 Daily Micro-Challenges
+   - One personalized challenge per day based on your history:
+     * "Beat yesterday's longest streak by 5 minutes"
+     * "Do 3 focus sessions today (your average is 2)"
+     * "Try focusing in your dead zone (Friday 4pm) — break the pattern"
+   - Completing challenges = Twin XP + streak maintenance
+   - Missing a day = Streak pauses (not resets — we're kind, not punishing)
 
-5.3 Web3 & Security Infrastructure
-Authentication: Privy (Embedded wallets, multi-party computation for key sharding).
 
-P2P Networking: rust-libp2p compiled to WebAssembly (Wasm) with WebTransport support for direct mobile-to-mobile node discovery.
+6. Monetization
+---------------
+Free Tier:
+   - Focus timer with twin avatar (3 moods)
+   - Basic daily challenge
+   - Simple stats (today + this week)
+   - 2 ambient sound options
 
-Cryptography: StarkWare S-two prover. Operates over a 31-bit Mersenne prime field, optimized for rapid proof generation on consumer-grade hardware.
+Premium (₹149/month or ₹999/year):
+   - Full twin evolution (all moods, animations, personality)
+   - Advanced AI insights (pattern detection, predictions, coaching)
+   - Weekly/monthly deep reports
+   - All ambient sounds + ability to add custom sounds
+   - Custom focus session types (deep work, light work, creative, study)
+   - Widget for home screen showing today's challenge
 
-6. UI/UX & Design System Requirements
-Theme: Deep Dark Mode (Backgrounds: #000000 to #0A0A12) to minimize battery consumption during training.
-
-Aesthetic: Premium Glassmorphism. Semi-transparent cards with heavy background blurs and subtle 1px neon borders.
-
-Color Accents: Vibrant Cyan (#00F2FE) to Deep Purple (#7F00FF) gradients to highlight active AI states and primary call-to-action buttons.
-
-Typography: Geometric sans-serifs (Space Grotesk or Outfit for headers, Inter for data points).
 
 7. Success Metrics (MVP KPIs)
-Time-to-Initialize: < 10 seconds from app launch to Evo Twin creation.
+-----------------------------
+   - Time to first focus session: < 60 seconds from app launch
+   - Day 7 retention: > 40% (industry avg for productivity apps is ~20%)
+   - Day 30 retention: > 20%
+   - Daily active sessions: > 1.5 per active user
+   - Free to premium conversion: > 5% within 30 days
+   - Average focus streak length growth: > 15% month-over-month
 
-Burst Training Duration: < 30 seconds per daily quest to prevent hardware strain.
 
-User Retention: Daily active completion rate of the 30-second micro-quests.
+8. What's NOT in MVP (Explicitly Excluded)
+------------------------------------------
+   - Social features / leaderboards (maybe v2)
+   - Web browser extension for website blocking (maybe v2)
+   - Wearable integration / Apple Watch (v3)
+   - Team/enterprise features (v3)
+   - Any cloud sync (v1 is 100% on-device)
+   - Any blockchain, tokens, ZK proofs, or Web3 features (permanently removed)
 
-8. Future Roadmap: The Intelligence Economy (Post-Hackathon)
-Phase 2: Decentralized Intelligence Marketplace launch.
 
-Phase 3: Smart contract integration allowing top-performing Evo Twins to be anonymously cloned or merged.
+9. Competitive Positioning
+--------------------------
+   Forest:       Dumb timer. Cute but no intelligence. We add AI + personality.
+   RescueTime:   Smart but creepy. Cloud-based surveillance. We add privacy + companion.
+   Centered:     AI nudges but cloud-based. No emotional connection. We add privacy + twin.
+   ActivityWatch: Private but no AI, no UX, no coaching. We add intelligence + design.
+   Rize:         AI tracking but cloud-based, dashboard-only. We add privacy + companion.
 
-Phase 4: On-chain financial rewards for data nodes contributing high-quality, real-world baseline models to the global swarm.
+   Focus Twin = Forest's simplicity + RescueTime's intelligence + Tamagotchi's emotional hook + ActivityWatch's privacy
