@@ -12,6 +12,7 @@ import FocusDashboard from "./pages/FocusDashboard.tsx";
 import FocusSession from "./pages/FocusSession.tsx";
 import Insights from "./pages/Insights.tsx";
 import MicroQuest from "./pages/MicroQuest.tsx";
+import AethosScan from "./pages/AethosScan.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => {
             <Route path="/focus" element={<FocusSession />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/quest" element={<MicroQuest />} />
+            <Route path="/explorer" element={<AethosScan />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

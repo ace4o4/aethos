@@ -3,7 +3,7 @@
  * Handles the "Replay Buffer" mixing old baselines with new data.
  */
 export const lettaAPI = {
-  async mixContext(newData: any, historicalBaseline: any) {
+  async mixContext(newData: unknown, historicalBaseline: unknown[]) {
     console.log('[Letta API] Mixing context in Replay Buffer...');
     
     await new Promise(res => setTimeout(res, 500));

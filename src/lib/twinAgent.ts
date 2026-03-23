@@ -103,19 +103,42 @@ function templateInsight(ctx: AgentContext): string {
 const SYSTEM_PROMPT =
   "You are a friendly, concise AI productivity coach for a focus app called Focus Twin. Keep responses under 2 sentences.";
 
-/** Try Chrome Prompt API (Gemini Nano built into Chrome 138+) */
-async function tryChromeLLM(prompt: string): Promise<string | null> {
+/** 
+ * Tier 1: Try Chrome Prompt API (Gemini Nano) 
+ * Tier 3: Fallback to Node.js AI Proxy (Gemini Cloud API) 
+ */
+async function queryAI(prompt: string): Promise<string | null> {
+  // 1. Try On-Device Chrome AI
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ai = (window as any).ai;
-    if (!ai?.languageModel) return null;
-    const session = await ai.languageModel.create({ systemPrompt: SYSTEM_PROMPT });
-    const result = await session.prompt(prompt);
-    session.destroy();
-    return typeof result === "string" ? result : null;
+    if (ai?.languageModel) {
+      const session = await ai.languageModel.create({ systemPrompt: SYSTEM_PROMPT });
+      const result = await session.prompt(prompt);
+      session.destroy();
+      if (typeof result === "string") return result;
+    }
   } catch {
-    return null;
+    console.warn("[Twin Agent] Chrome AI not available. Falling back to secure Cloud Proxy.");
   }
+
+  // 2. Try Node Proxy (Tier 3 Fallback)
+  try {
+    const res = await fetch("http://localhost:3002/api/ai/prompt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.result) return data.result;
+    }
+  } catch (err) {
+    console.warn("[Twin Agent] Cloud Proxy unreachable. Falling back to templates.");
+  }
+
+  return null;
 }
 
 /** Generate a personalized greeting */
@@ -124,7 +147,7 @@ export async function getGreeting(ctx: AgentContext): Promise<string> {
   const h = new Date().getHours();
   const timeHint = h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
 
-  const llmResult = await tryChromeLLM(
+  const llmResult = await queryAI(
     `It's ${timeHint}. User stats: ${stats}. Give a 1-sentence motivational greeting.`
   );
   return llmResult ?? templateGreeting(ctx);
@@ -135,7 +158,7 @@ export async function getPostSessionMessage(ctx: AgentContext): Promise<string> 
   const stats = buildStatsSummary(ctx);
   const mins = ctx.sessionDurationMins ?? 0;
 
-  const llmResult = await tryChromeLLM(
+  const llmResult = await queryAI(
     `User just finished a ${mins}-minute focus session. Stats: ${stats}. Give a 1-sentence celebration and coaching tip.`
   );
   return llmResult ?? templatePostSession(ctx);
@@ -145,7 +168,7 @@ export async function getPostSessionMessage(ctx: AgentContext): Promise<string> 
 export async function getInsight(ctx: AgentContext): Promise<string> {
   const stats = buildStatsSummary(ctx);
 
-  const llmResult = await tryChromeLLM(
+  const llmResult = await queryAI(
     `Based on focus stats: ${stats}. Give one actionable insight in 1 sentence.`
   );
   return llmResult ?? templateInsight(ctx);

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Zap, BarChart2 } from "lucide-react";
+import { Zap, BarChart2, Cpu, Activity, Network } from "lucide-react";
 import EvoTwin from "@/components/EvoTwin";
 import DoodleThemeToggle from "@/components/DoodleThemeToggle";
 import { playClick, playWhoosh } from "@/lib/sounds";
@@ -10,6 +10,16 @@ import { computePatterns } from "@/lib/patternEngine";
 import { loadTwinState, levelProgress, xpForLevel } from "@/lib/twinEngine";
 import { getTodayChallenge, type DailyChallenge } from "@/lib/challengeGen";
 import { getGreeting } from "@/lib/twinAgent";
+import { fetchRecentProofs } from "@/lib/ml";
+
+interface ZKProof {
+  id: number;
+  data_type: string;
+  proof_hash: string;
+  reward: string;
+  tx_hash: string;
+  created_at: string;
+}
 
 const FocusDashboard = () => {
   const navigate = useNavigate();
@@ -17,18 +27,21 @@ const FocusDashboard = () => {
   const [todayMins, setTodayMins] = useState(0);
   const [greeting, setGreeting] = useState("Loading…");
   const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
+  const [proofs, setProofs] = useState<ZKProof[]>([]);
   const [loading, setLoading] = useState(true);
 
   const twinState = loadTwinState();
 
   useEffect(() => {
     (async () => {
-      const [mins, sessions] = await Promise.all([
+      const [mins, sessions, recentProofs] = await Promise.all([
         getTodayFocusMinutes(),
         getRecentSessions(30),
+        fetchRecentProofs(),
       ]);
       const patterns = computePatterns(sessions);
       setTodayMins(mins);
+      setProofs(recentProofs);
       const ch = getTodayChallenge(patterns, twinState);
       setChallenge(ch);
       setLoading(false);
@@ -47,6 +60,12 @@ const FocusDashboard = () => {
   const handleInsights = useCallback(() => {
     playClick();
     navigate("/insights");
+  }, [navigate]);
+
+  const handleQuest = useCallback(() => {
+    playClick();
+    playWhoosh();
+    navigate("/quest");
   }, [navigate]);
 
   const progress = levelProgress(twinState);
@@ -74,13 +93,21 @@ const FocusDashboard = () => {
             <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">Focus Twin</p>
             <h1 className="text-xl font-mono font-bold tracking-tighter gradient-text-aurora">Home</h1>
           </div>
-          <button
-            onClick={handleInsights}
-            className="w-9 h-9 rounded-full bg-card/60 border border-border flex items-center justify-center hover:bg-muted/40 transition-colors"
-            aria-label="View insights"
-          >
-            <BarChart2 className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="px-3 h-9 rounded-full bg-card/60 border border-primary/20 flex items-center gap-2 hover:bg-muted/40 transition-colors"
+            >
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-mono text-primary tracking-widest">NODE ONLINE</span>
+            </button>
+            <button
+              onClick={handleInsights}
+              className="w-9 h-9 rounded-full bg-card/60 border border-border flex items-center justify-center hover:bg-muted/40 transition-colors"
+              aria-label="View insights"
+            >
+              <BarChart2 className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
         </motion.div>
 
         {/* Twin + greeting */}
@@ -174,12 +201,77 @@ const FocusDashboard = () => {
             onClick={handleStartFocus}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full h-16 rounded-2xl font-mono text-base font-bold text-background tracking-wider shadow-lg"
+            className="w-full h-16 rounded-2xl font-mono text-base font-bold text-background tracking-wider shadow-lg mb-4"
             style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))" }}
           >
             START FOCUS
           </motion.button>
+          
+          <motion.button
+            onClick={handleQuest}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full h-16 rounded-2xl font-mono text-sm font-bold text-primary tracking-wider border border-primary/20 bg-primary/5 flex items-center justify-between px-6 hover:bg-primary/10 transition-colors relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 w-full h-full bg-primary/5 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+            <div className="flex items-center gap-3">
+              <Cpu className="w-5 h-5" />
+              <span>TRAIN ML BRAIN</span>
+            </div>
+            <div className="flex items-center gap-1.5 opacity-60">
+              <Activity className="w-3 h-3 animate-pulse" />
+              <span className="text-[10px]">ZK-SYNC</span>
+            </div>
+          </motion.button>
         </motion.div>
+
+        {/* Network Activity LEDGER */}
+        {proofs.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mt-6 border border-border bg-card/40 rounded-2xl p-4 shadow-inner"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Network className="w-4 h-4 text-primary" />
+                <h3 className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">Network Ledger</h3>
+              </div>
+              <button 
+                onClick={() => { playClick(); navigate('/explorer'); }}
+                className="text-[9px] font-mono text-primary flex items-center gap-1 hover:underline p-1"
+              >
+                View on AethosScan &rarr;
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {proofs.map((proof) => (
+                <div key={proof.id} className="p-3 bg-background/50 border border-primary/20 rounded-xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-8 h-full bg-primary/5 -skew-x-12 translate-x-4 group-hover:-translate-x-full transition-transform duration-700" />
+                  
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-[10px] text-primary font-mono tracking-tighter truncate w-32 border border-primary/30 bg-primary/10 px-1.5 py-0.5 rounded">
+                      {proof.tx_hash.slice(0, 8)}...{proof.tx_hash.slice(-6)}
+                    </p>
+                    <span className="text-[10px] font-mono text-success drop-shadow-[0_0_5px_rgba(74,222,128,0.3)]">+{proof.reward}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center text-xs">
+                    <div className="flex items-center gap-1.5">
+                      {proof.data_type === "audio" ? <span className="text-[8px]">🔊</span> : <span className="text-[8px]">👁️</span>}
+                      <span className="text-[9px] font-mono text-muted-foreground uppercase">ZK-{proof.data_type}-PROOF</span>
+                    </div>
+                    <span className="text-[9px] font-mono text-muted-foreground/50">
+                      {new Date(proof.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

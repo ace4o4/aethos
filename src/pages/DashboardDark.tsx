@@ -1,13 +1,46 @@
-import { motion } from "framer-motion";
-import { Wifi, Lock, Sparkles, ChevronRight, ActivitySquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Wifi, Lock, ChevronRight, ActivitySquare, Hash, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DoodleThemeToggle from "@/components/DoodleThemeToggle";
+import { fetchRecentProofs } from "@/lib/ml";
+
+interface ZKProof {
+  id: number;
+  data_type: string;
+  proof_hash: string;
+  reward: string;
+  tx_hash: string;
+  created_at: string;
+}
 
 const DashboardDark = () => {
   const navigate = useNavigate();
+  const [proofs, setProofs] = useState<ZKProof[]>([]);
+  const [networkEvents, setNetworkEvents] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchRecentProofs().then(setProofs);
+
+    // Simulated Global Network Pulse
+    const interval = setInterval(() => {
+      const events = [
+        "Peer verified ZK-Audio proof [0x7a...d9]",
+        "New Block height #1,489,921 reached",
+        "Evo-1X node synced to mainnet",
+        "Reward disbursed: +0.0003 ETH to Peer_82",
+        "Quantum-Safe tunnel established",
+        "Validation complete: Frame_4402"
+      ];
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      setNetworkEvents(prev => [randomEvent, ...prev].slice(0, 3));
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="relative h-full min-h-[100dvh] bg-[#030712] font-sans selection:bg-[#00F2FE]/30 overflow-hidden flex items-center justify-center">
+    <div className="relative h-full min-h-[100dvh] bg-[#030712] font-sans selection:bg-[#00F2FE]/30 overflow-y-auto overflow-x-hidden">
       
       {/* 
         =======================================================================
@@ -17,6 +50,24 @@ const DashboardDark = () => {
       <div className="absolute inset-0 pointer-events-none overflow-hidden mix-blend-screen">
         {/* Abstract Noise Grain */}
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')" }}></div>
+        
+        {/* LIVE NETWORK PULSE UI (Bottom Left Float) */}
+        <div className="absolute bottom-[2%] left-[2%] z-50 pointer-events-auto h-[100px] w-[220px] hidden md:flex flex-col gap-2 overflow-hidden">
+           <AnimatePresence>
+             {networkEvents.map((ev, i) => (
+                <motion.div 
+                  key={ev + i} 
+                  initial={{ opacity: 0, x: -10, y: 10 }} 
+                  animate={{ opacity: 1, x: 0, y: 0 }} 
+                  exit={{ opacity: 0, scale: 0.9 }} 
+                  className="bg-black/60 backdrop-blur-md border border-white/5 rounded-lg px-3 py-2 text-[9px] font-mono text-primary/80 flex items-center gap-2 whitespace-nowrap shadow-lg"
+                >
+                  <div className="w-1 h-1 bg-primary rounded-full animate-ping" />
+                  {ev}
+                </motion.div>
+             ))}
+           </AnimatePresence>
+        </div>
         
         {/* Massive Ambient Spawns (Neon Dark Mode) */}
         <motion.div 
@@ -159,6 +210,59 @@ const DashboardDark = () => {
            <span className="font-bold tracking-widest text-black uppercase text-[11px] relative z-10">Init Quest</span>
            <ChevronRight className="w-4 h-4 text-black relative z-10 group-hover:translate-x-1 transition-transform" />
         </motion.button>
+
+        {/* 
+          NETWORK LEDGER SECTION
+        */}
+        {proofs.length > 0 && (
+          <motion.div
+            className="w-full mt-[85vh] pb-10 px-2 z-30 relative"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <div className="bg-white/5 backdrop-blur-[40px] border border-white/10 rounded-[24px] p-5 shadow-[0_20px_40px_-10px_rgba(0,242,254,0.15)]">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <Hash className="w-4 h-4 text-[#00F2FE]" />
+                  <span className="text-[10px] font-bold tracking-widest text-[#00F2FE] uppercase">Network Ledger</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse ml-1" />
+                </div>
+                <button
+                  onClick={() => navigate('/explorer')}
+                  className="flex items-center gap-1 text-[9px] font-bold tracking-widest text-white/60 hover:text-white transition-colors uppercase"
+                >
+                  AethosScan <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Proof Cards */}
+              <div className="space-y-2.5">
+                {proofs.map((proof) => {
+                  const age = Math.max(1, Math.floor((Date.now() - new Date(proof.created_at).getTime()) / 60000));
+                  return (
+                    <div key={proof.id} className="bg-black/30 border border-white/5 rounded-2xl p-3.5 flex items-center gap-3 group hover:border-[#00F2FE]/30 transition-colors">
+                      {/* Icon */}
+                      <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-sm">
+                        {proof.data_type === "audio" ? "🔊" : "👁️"}
+                      </div>
+                      {/* Details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-mono text-[#00F2FE] truncate">{proof.tx_hash}</p>
+                        <p className="text-[9px] text-zinc-500 mt-0.5 font-mono uppercase">ZK-{proof.data_type} · {age}m ago</p>
+                      </div>
+                      {/* Reward */}
+                      <span className="text-xs font-bold text-white font-mono shrink-0 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
+                        +{proof.reward}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
       </main>
     </div>

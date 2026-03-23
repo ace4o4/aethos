@@ -25,7 +25,7 @@ export const playClick = () => {
     osc.connect(gain).connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.08);
-  } catch {}
+  } catch (e) { /* empty */ }
 };
 
 /** Whoosh — filtered noise sweep */
@@ -55,7 +55,7 @@ export const playWhoosh = () => {
     source.connect(filter).connect(gain).connect(ctx.destination);
     source.start();
     source.stop(ctx.currentTime + 0.3);
-  } catch {}
+  } catch (e) { /* empty */ }
 };
 
 /** Particle pop — high sparkle */
@@ -72,7 +72,7 @@ export const playPop = () => {
     osc.connect(gain).connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.12);
-  } catch {}
+  } catch (e) { /* empty */ }
 };
 
 /** Success chime — two-note arpeggio */
@@ -90,7 +90,7 @@ export const playSuccess = () => {
       osc.start(ctx.currentTime + i * 0.12);
       osc.stop(ctx.currentTime + i * 0.12 + 0.3);
     });
-  } catch {}
+  } catch (e) { /* empty */ }
 };
 
 /** Ambient hum — low drone, returns stop function */
@@ -126,7 +126,7 @@ export const startAmbientHum = (): (() => void) => {
     return () => {
       gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
       setTimeout(() => {
-        try { osc1.stop(); osc2.stop(); lfo.stop(); } catch {}
+        try { osc1.stop(); osc2.stop(); lfo.stop(); } catch (e) { /* empty */ }
       }, 1100);
     };
   } catch {
@@ -139,5 +139,5 @@ export const haptic = (style: "light" | "medium" | "heavy" = "light") => {
   try {
     const ms = style === "light" ? 10 : style === "medium" ? 25 : 50;
     navigator.vibrate?.(ms);
-  } catch {}
+  } catch (e) { /* empty */ }
 };
