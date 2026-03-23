@@ -8,6 +8,9 @@ import SplashScreen from "@/components/SplashScreen";
 import Gateway from "./pages/Gateway.tsx";
 import GenesisRoom from "./pages/GenesisRoom.tsx";
 import Dashboard from "./pages/DashboardRouter.tsx";
+import FocusDashboard from "./pages/FocusDashboard.tsx";
+import FocusSession from "./pages/FocusSession.tsx";
+import Insights from "./pages/Insights.tsx";
 import MicroQuest from "./pages/MicroQuest.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -28,6 +31,9 @@ const App = () => {
             <Route path="/" element={<Gateway />} />
             <Route path="/genesis" element={<GenesisRoom />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/home" element={<FocusDashboard />} />
+            <Route path="/focus" element={<FocusSession />} />
+            <Route path="/insights" element={<Insights />} />
             <Route path="/quest" element={<MicroQuest />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
