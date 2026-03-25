@@ -4,7 +4,6 @@
 
 ---
 
--
 
 ## What Is This?
 
